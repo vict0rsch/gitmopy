@@ -69,7 +69,7 @@ def save_to_history(commit_dict, history=None):
     )
     if not HISTORY_PATH.parent.exists():
         HISTORY_PATH.parent.mkdir(parents=True)
-        print("\n[bold green]Created history file in", str(HISTORY_PATH), end="\n\n")
+        print("[bold green]Created history file in", str(HISTORY_PATH), end="\n\n")
 
     HISTORY_PATH.write_text(json.dumps(history))
 
