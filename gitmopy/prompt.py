@@ -652,7 +652,7 @@ def commit_prompt(config):
             max_height="70%",
             mandatory=True,
             qmark="❓",
-            amark="👌",
+            amark="☑︎",
         )
         .execute()
         .strip()
@@ -665,8 +665,8 @@ def commit_prompt(config):
             inquirer.text(
                 message="Select scope (optional):",
                 mandatory=False,
-                qmark="❓",
-                amark="👌",
+                qmark="⭕️",
+                amark="☑︎",
                 completer=GMPCompleter("scope"),
             )
             .execute()
@@ -680,8 +680,8 @@ def commit_prompt(config):
             mandatory_message="You must provide a commit tile",
             validate=lambda t: len(t) > 0,
             invalid_message="You must provide a commit tile",
-            qmark="❓",
-            amark="👌",
+            qmark="⭐️",
+            amark="☑︎",
             transformer=lambda t: t.capitalize() if config["capitalize_title"] else t,
             completer=GMPCompleter("title"),
         )
@@ -696,8 +696,8 @@ def commit_prompt(config):
             inquirer.text(
                 message="Enter commit message (optional):",
                 mandatory=False,
-                qmark="❓",
-                amark="👌",
+                qmark="💬",
+                amark="☑︎",
                 completer=GMPCompleter("message"),
             )
             .execute()
@@ -728,7 +728,7 @@ def setup_prompt():
         cycle=True,
         transformer=lambda result: "",
         qmark="❓",
-        amark="👌",
+        amark="☑︎",
     ).execute()
 
     selected = set(selected)
@@ -737,7 +737,6 @@ def setup_prompt():
         config[c.value] = c.value in selected
 
     save_config(config)
-
 
 
 def git_add_prompt(status):
@@ -755,7 +754,7 @@ def git_add_prompt(status):
         cycle=True,
         transformer=lambda result: "",
         qmark="❓",
-        amark="👌",
+        amark="☑︎",
     ).execute()
 
     return selected
