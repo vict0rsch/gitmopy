@@ -137,5 +137,14 @@ def setup():
     setup_prompt()
 
 
+@app.command(
+    help="Print version",
+)
+def version():
+    import gitmopy
+
+    print(gitmopy.__version__)
+
+
 if __name__ == "__main__":
     app()
