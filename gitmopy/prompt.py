@@ -4,7 +4,7 @@ from InquirerPy.base.control import Choice, Separator
 from prompt_toolkit.completion import Completer, Completion
 
 from gitmopy import history as gmp_history
-from gitmopy.utils import load_config, save_config, DEFAULT_CHOICES
+from gitmopy.utils import load_config, save_config, DEFAULT_CHOICES, APP_PATH
 
 # https://github.com/carloscuesta/gitmoji/blob/master/packages/gitmojis/src/gitmojis.json
 EMODATA = {
@@ -652,7 +652,7 @@ def commit_prompt(config):
             max_height="70%",
             mandatory=True,
             qmark="❓",
-            amark="👌",
+            amark="✓",
         )
         .execute()
         .strip()
@@ -665,8 +665,8 @@ def commit_prompt(config):
             inquirer.text(
                 message="Select scope (optional):",
                 mandatory=False,
-                qmark="❓",
-                amark="👌",
+                qmark="⭕️",
+                amark="✓",
                 completer=GMPCompleter("scope"),
             )
             .execute()
@@ -675,13 +675,14 @@ def commit_prompt(config):
 
     title = (
         inquirer.text(
-            message="Enter commit title:",
+            message="Commit title:",
+            long_instruction="<= 50 characters ideally",
             mandatory=True,
             mandatory_message="You must provide a commit tile",
             validate=lambda t: len(t) > 0,
             invalid_message="You must provide a commit tile",
-            qmark="❓",
-            amark="👌",
+            qmark="⭐️",
+            amark="✓",
             transformer=lambda t: t.capitalize() if config["capitalize_title"] else t,
             completer=GMPCompleter("title"),
         )
@@ -694,10 +695,10 @@ def commit_prompt(config):
     if not config["skip_message"]:
         message = (
             inquirer.text(
-                message="Enter commit message (optional):",
+                message="Commit details (optional):",
                 mandatory=False,
-                qmark="❓",
-                amark="👌",
+                qmark="💬",
+                amark="✓",
                 completer=GMPCompleter("message"),
             )
             .execute()
@@ -723,12 +724,12 @@ def setup_prompt():
     selected = inquirer.checkbox(
         message="Setup gitmopy locally.",
         instruction="Use 'space' to (de-)select.",
-        long_instruction="Config will be saved in ~/.gitmopy/config.yaml.",
+        long_instruction=f"Config will be saved in {str(APP_PATH)}/config.yaml.",
         choices=choices,
         cycle=True,
         transformer=lambda result: "",
         qmark="❓",
-        amark="👌",
+        amark="✓",
     ).execute()
 
     selected = set(selected)
@@ -737,7 +738,6 @@ def setup_prompt():
         config[c.value] = c.value in selected
 
     save_config(config)
-
 
 
 def git_add_prompt(status):
@@ -755,7 +755,7 @@ def git_add_prompt(status):
         cycle=True,
         transformer=lambda result: "",
         qmark="❓",
-        amark="👌",
+        amark="✓",
     ).execute()
 
     return selected

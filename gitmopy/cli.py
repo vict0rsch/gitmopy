@@ -42,13 +42,13 @@ def commit(
             help="Whether or not to add all unstaged files if none is already staged"
         ),
     ] = False,
-    push: Annotated[
-        str,
-        typer.Option(
-            help="Where to push after the commit (for instance: 'origin master)."
-            + "Quotes must be used. Disabled by default."
-        ),
-    ] = None,
+    # push: Annotated[
+    #     str,
+    #     typer.Option(
+    #         help="Where to push after the commit (for instance: 'origin master)."
+    #         + "Quotes must be used. Disabled by default."
+    #     ),
+    # ] = None,
     dry: Annotated[
         bool, typer.Option(help="Whether or not to actually commit.")
     ] = False,
@@ -119,15 +119,15 @@ def commit(
 
     repo.index.commit(commit_message)
 
-    if push == "":
-        typer.echo("Pushing to origin...")
-        origin = repo.remote(name="origin")
-        origin.push()
-    elif push is not None:
-        typer.echo(f"Pushing to {push}...")
-        dest, branch = push.split(" ")
-        repo.git.push(dest, branch)
-    typer.echo("Done 🥳")
+    # if push == "":
+    #     typer.echo("Pushing to origin...")
+    #     origin = repo.remote(name="origin")
+    #     origin.push()
+    # elif push is not None:
+    #     typer.echo(f"Pushing to {push}...")
+    #     dest, branch = push.split(" ")
+    #     repo.git.push(dest, branch)
+    print("\nDone 🥳\n")
 
 
 @app.command(
@@ -135,6 +135,15 @@ def commit(
 )
 def setup():
     setup_prompt()
+
+
+@app.command(
+    help="Print version",
+)
+def version():
+    import gitmopy
+
+    print(gitmopy.__version__)
 
 
 if __name__ == "__main__":
