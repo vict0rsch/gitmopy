@@ -652,7 +652,7 @@ def commit_prompt(config):
             max_height="70%",
             mandatory=True,
             qmark="❓",
-            amark="☑︎",
+            amark="✓",
         )
         .execute()
         .strip()
@@ -666,7 +666,7 @@ def commit_prompt(config):
                 message="Select scope (optional):",
                 mandatory=False,
                 qmark="⭕️",
-                amark="☑︎",
+                amark="✓",
                 completer=GMPCompleter("scope"),
             )
             .execute()
@@ -675,13 +675,14 @@ def commit_prompt(config):
 
     title = (
         inquirer.text(
-            message="Enter commit title:",
+            message="Commit title:",
+            long_instruction="<= 50 characters ideally",
             mandatory=True,
             mandatory_message="You must provide a commit tile",
             validate=lambda t: len(t) > 0,
             invalid_message="You must provide a commit tile",
             qmark="⭐️",
-            amark="☑︎",
+            amark="✓",
             transformer=lambda t: t.capitalize() if config["capitalize_title"] else t,
             completer=GMPCompleter("title"),
         )
@@ -694,10 +695,10 @@ def commit_prompt(config):
     if not config["skip_message"]:
         message = (
             inquirer.text(
-                message="Enter commit message (optional):",
+                message="Commit details (optional):",
                 mandatory=False,
                 qmark="💬",
-                amark="☑︎",
+                amark="✓",
                 completer=GMPCompleter("message"),
             )
             .execute()
@@ -728,7 +729,7 @@ def setup_prompt():
         cycle=True,
         transformer=lambda result: "",
         qmark="❓",
-        amark="☑︎",
+        amark="✓",
     ).execute()
 
     selected = set(selected)
@@ -754,7 +755,7 @@ def git_add_prompt(status):
         cycle=True,
         transformer=lambda result: "",
         qmark="❓",
-        amark="☑︎",
+        amark="✓",
     ).execute()
 
     return selected
