@@ -127,7 +127,7 @@ def commit(
         typer.echo(f"Pushing to {push}...")
         dest, branch = push.split(" ")
         repo.git.push(dest, branch)
-    print("\nDone 🥳")
+    print("\nDone 🥳\n")
 
 
 @app.command(

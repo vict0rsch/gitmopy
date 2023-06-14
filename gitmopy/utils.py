@@ -3,13 +3,14 @@ from pathlib import Path
 from typing import Union
 from yaml import safe_load, safe_dump
 from rich import print
+import typer
 
 
 def resolve_path(path: Union[str, Path]) -> Path:
     return Path(expandvars(path)).expanduser().resolve()
 
 
-APP_PATH = resolve_path("~/.gitmopy")
+APP_PATH = resolve_path(typer.get_app_dir("gitmopy"))
 
 DEFAULT_CHOICES = [
     {
@@ -30,7 +31,7 @@ DEFAULT_CHOICES = [
     {
         "value": "enable_history",
         "name": "Remember commit history for auto-complete and emoji sorting"
-        + " (saved in ~/.gitmopy/history.json)",
+        + f" (saved in {str(APP_PATH)}/history.json)",
         "default": True,
     },
 ]
@@ -56,8 +57,6 @@ def save_config(config):
 def print_staged_files(staged):
     nst = len(staged)
     s = "" if nst == 1 else "s"
-    print(
-        f"[green3]Currently {nst} staged file{s} for commit:[/green3]"
-    )
+    print(f"[green3]Currently {nst} staged file{s} for commit:[/green3]")
     for f in staged:
         print(f"  [grey66]- {f}[/grey66]")

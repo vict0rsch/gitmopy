@@ -4,7 +4,7 @@ from InquirerPy.base.control import Choice, Separator
 from prompt_toolkit.completion import Completer, Completion
 
 from gitmopy import history as gmp_history
-from gitmopy.utils import load_config, save_config, DEFAULT_CHOICES
+from gitmopy.utils import load_config, save_config, DEFAULT_CHOICES, APP_PATH
 
 # https://github.com/carloscuesta/gitmoji/blob/master/packages/gitmojis/src/gitmojis.json
 EMODATA = {
@@ -724,7 +724,7 @@ def setup_prompt():
     selected = inquirer.checkbox(
         message="Setup gitmopy locally.",
         instruction="Use 'space' to (de-)select.",
-        long_instruction="Config will be saved in ~/.gitmopy/config.yaml.",
+        long_instruction=f"Config will be saved in {str(APP_PATH)}/config.yaml.",
         choices=choices,
         cycle=True,
         transformer=lambda result: "",
