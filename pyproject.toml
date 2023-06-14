@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "gitmopy"
+version = "0.1.0"
+description = "A python command-line for gitmoji"
+authors = ["vict0rsch <vsch@pm.me>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+emoji = "^2.5.0"
+GitPython = "^3.1.31"
+typer = {extras = ["all"], version = "^0.9.0"}
+pyyaml = "^6.0"
+fuzzysearch = "^0.7.3"
+inquirerpy = "^0.3.4"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+isort = "^5.12.0"
+ipython = "^8.14.0"
+
+[tool.poetry.scripts]
+gitmopy = "gitmopy.cli:app"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
