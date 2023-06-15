@@ -1,14 +1,15 @@
-from typing import List
+from typing import List, Optional, Any, Dict
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice, Separator
 from prompt_toolkit.completion import Completer, Completion
+from prompt_toolkit.document import Document
 
 from gitmopy import history as gmp_history
 from gitmopy.utils import load_config, save_config, DEFAULT_CHOICES, APP_PATH, GITMOJIS
 
 
 class GMPCompleter(Completer):
-    def __init__(self, key, max_results=10):
+    def __init__(self, key: str, max_results: Optional[int] = 10):
         """
         A completer that completes a text prompt from the user's history.
         Completions are sorted by most recent first.
@@ -27,7 +28,7 @@ class GMPCompleter(Completer):
                 self.candidates[c[key]] = max(self.candidates[c[key]], c["timestamp"])
         super().__init__()
 
-    def get_completions(self, document, complete_event):
+    def get_completions(self, document: Document, complete_event: Any) -> Completion:
         """
         Get completions for the current prompt.
 
@@ -37,7 +38,8 @@ class GMPCompleter(Completer):
         Case insensitive.
 
         Args:
-            document (prompt_toolkit. ): The current document from the prompt.
+            document (prompt_toolkit.document.Document): The current document from the
+                prompt.
             complete_event (Any): Unused.
 
         Yields:
@@ -56,7 +58,7 @@ class GMPCompleter(Completer):
             yield Completion(m[0], start_position=-len(document.text))
 
 
-def commit_prompt(config):
+def commit_prompt(config: Dict[str, bool]) -> Dict[str, str]:
     """
     Prompt the user for a commit message in up to 4 steps:
     - Select gitmoji
@@ -152,7 +154,7 @@ def commit_prompt(config):
     }
 
 
-def config_prompt():
+def config_prompt() -> None:
     """
     Prompt the user for configuration options.
     Will setup:
@@ -189,7 +191,7 @@ def config_prompt():
     save_config(config)
 
 
-def git_add_prompt(status):
+def git_add_prompt(status: Dict[str, List[str]]) -> List[str]:
     """
     Start a prompt to select files to add to the commit.
 
