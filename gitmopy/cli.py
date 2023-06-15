@@ -172,6 +172,13 @@ def commit(
             + "to push to multiple remotes"
         ),
     ] = None,
+    keep_alive: Annotated[
+        Optional[bool],
+        typer.Option(
+            help="Whether or not to keep the app alive after commit, to be ready "
+            + "for another one. "
+        ),
+    ] = False,
 ):
     """
     Main command: commit staged files, and staging files if need be.
@@ -188,111 +195,116 @@ def commit(
         typer.Exit: No staged files and user does not want to add.
         typer.Exit: User asked for a dry run.
     """
-    # resolve repository path
-    repo_path = resolve_path(repo)
-    repo_ok = False
-    # load repo from path
-    try:
-        repo = git.Repo(str(repo_path))
-        repo_ok = True
-    except git.exc.InvalidGitRepositoryError:
-        if not dry:
-            rp = typer.style(str(repo_path), bg=typer.colors.RED)
-            mess = typer.style(" is not a valid git repository.", fg=typer.colors.RED)
-            typer.echo(rp + mess)
-            raise typer.Exit(1)
-    if repo_ok:
-        # get current files' status
-        status = get_files_status(repo)
-
-    if not dry:
-        # no staged files and user does not want to add: abort
-        if not status["staged"] and not add:
-            print(
-                "\n[yellow]"
-                + "No staged files. Stage files yourself or use [b]--add[/b]"
-                + " to add all unstaged files.[/yellow]\n"
-            )
-            raise typer.Exit(1)
-        if remote is not None and not push:
-            print(
-                "\n[yellow]Ignoring --remote flag because --push is not set[/yellow]\n"
-            )
-        # no staged files fbut user wants to add: start prompt
-        if not status["staged"] and add:
-            # PROMPT: list files to user and add their selection
-            to_add = git_add_prompt(status)
-            for f in to_add:
-                repo.git.add(f)
-            print_staged_files(to_add)
-        else:
-            # there are staged files: list them to user
-            if add:
-                print(
-                    "[yellow]Ignoring --add flag because the stage is"
-                    + " not empty[/yellow]\n"
+    while True:
+        # resolve repository path
+        repo_path = resolve_path(repo)
+        repo_ok = False
+        # load repo from path
+        try:
+            repo = git.Repo(str(repo_path))
+            repo_ok = True
+        except git.exc.InvalidGitRepositoryError:
+            if not dry:
+                rp = typer.style(str(repo_path), bg=typer.colors.RED)
+                mess = typer.style(
+                    " is not a valid git repository.", fg=typer.colors.RED
                 )
-            print_staged_files(status["staged"])
+                typer.echo(rp + mess)
+                raise typer.Exit(1)
+        if repo_ok:
+            # get current files' status
+            status = get_files_status(repo)
 
-    # load gitmopy's configuraltion from yaml file
-    config = load_config()
-
-    # PROMPT: get user's commit details
-    print("\n[u green3]Commit details:[/u green3]")
-    commit_dict = commit_prompt(config)
-
-    # make commit messsage
-    commit_message = message_from_commit_dict(commit_dict)
-
-    if dry:
-        # Don't do anything, just print the commit message
-        print("\nFormatted commit:\n```")
-        print(commit_message)
-        print("```")
-        raise typer.Exit(0)
-
-    if config["enable_history"]:
-        # save commit details to history
-        save_to_history(commit_dict)
-
-    # commit
-    repo.index.commit(commit_message)
-
-    if push:
-        if len(repo.remotes) == 0:
-            print("[yellow]No remote found. Ignoring push.[/yellow]")
-        else:
-            selected_remotes = set([repo.remotes[0].name])
-            if len(repo.remotes) > 1:
-                # PROMPT: choose remote
-                if remote:
-                    selected_remotes = set(remote)
-                else:
-                    selected_remotes = choose_remote_prompt(repo.remotes)
-                if not selected_remotes:
-                    print("[yellow]No remote selected. Aborting.[/yellow]")
-                    raise typer.Exit(1)
-                selected_remotes = set(selected_remotes)
-            print()
-            color = "dodger_blue3"
-            for remote in repo.remotes:
-                if remote.name in selected_remotes:
+        if not dry:
+            # no staged files and user does not want to add: abort
+            if not status["staged"] and not add:
+                print(
+                    "\n[yellow]"
+                    + "No staged files. Stage files yourself or use [b]--add[/b]"
+                    + " to add all unstaged files.[/yellow]\n"
+                )
+                raise typer.Exit(1)
+            if remote is not None and not push:
+                print(
+                    "\n[yellow]Ignoring --remote flag because --push is not set[/yellow]\n"
+                )
+            # no staged files fbut user wants to add: start prompt
+            if not status["staged"] and add:
+                # PROMPT: list files to user and add their selection
+                to_add = git_add_prompt(status)
+                for f in to_add:
+                    repo.git.add(f)
+                print_staged_files(to_add)
+            else:
+                # there are staged files: list them to user
+                if add:
                     print(
-                        f"[{color}]Pushing to remote {remote.name}[/{color}]",
+                        "[yellow]Ignoring --add flag because the stage is"
+                        + " not empty[/yellow]\n"
                     )
-                    with CatchRemoteException(remote.name) as cre:
-                        repo.git.push(remote.name, repo.active_branch.name)
-                        remote.push()
-                    if cre.set_upsteam:
-                        set_upstream = set_upstream_prompt(remote.name)
-                        if set_upstream:
-                            with CatchRemoteException(remote.name) as cre:
-                                repo.git.push(
-                                    "--set-upstream",
-                                    remote.name,
-                                    repo.active_branch.name,
-                                )
-    print("\nDone 🥳\n")
+                print_staged_files(status["staged"])
+
+        # load gitmopy's configuraltion from yaml file
+        config = load_config()
+
+        # PROMPT: get user's commit details
+        print("\n[u green3]Commit details:[/u green3]")
+        commit_dict = commit_prompt(config)
+
+        # make commit messsage
+        commit_message = message_from_commit_dict(commit_dict)
+
+        if dry:
+            # Don't do anything, just print the commit message
+            print("\nFormatted commit:\n```")
+            print(commit_message)
+            print("```")
+            raise typer.Exit(0)
+
+        if config["enable_history"]:
+            # save commit details to history
+            save_to_history(commit_dict)
+
+        # commit
+        repo.index.commit(commit_message)
+
+        if push:
+            if len(repo.remotes) == 0:
+                print("[yellow]No remote found. Ignoring push.[/yellow]")
+            else:
+                selected_remotes = set([repo.remotes[0].name])
+                if len(repo.remotes) > 1:
+                    # PROMPT: choose remote
+                    if remote:
+                        selected_remotes = set(remote)
+                    else:
+                        selected_remotes = choose_remote_prompt(repo.remotes)
+                    if not selected_remotes:
+                        print("[yellow]No remote selected. Aborting.[/yellow]")
+                        raise typer.Exit(1)
+                    selected_remotes = set(selected_remotes)
+                print()
+                color = "dodger_blue3"
+                for remote in repo.remotes:
+                    if remote.name in selected_remotes:
+                        print(
+                            f"[{color}]Pushing to remote {remote.name}[/{color}]",
+                        )
+                        with CatchRemoteException(remote.name) as cre:
+                            repo.git.push(remote.name, repo.active_branch.name)
+                            remote.push()
+                        if cre.set_upsteam:
+                            set_upstream = set_upstream_prompt(remote.name)
+                            if set_upstream:
+                                with CatchRemoteException(remote.name) as cre:
+                                    repo.git.push(
+                                        "--set-upstream",
+                                        remote.name,
+                                        repo.active_branch.name,
+                                    )
+        print("\nDone 🥳\n")
+        if not keep_alive:
+            break
 
 
 @app.command(
