@@ -1,28 +1,83 @@
+from typing import Dict, List
+
 import git
 import typer
-from typing_extensions import Annotated
+from git import Repo
 from rich import print
+from typing_extensions import Annotated
 
-from gitmopy.prompt import commit_prompt, setup_prompt, git_add_prompt
-from gitmopy.utils import resolve_path, load_config, print_staged_files
-from gitmopy.history import save_to_history
+from gitmopy.history import gitmojis_setup, save_to_history
+from gitmopy.prompt import (
+    choose_remote_prompt,
+    commit_prompt,
+    config_prompt,
+    git_add_prompt,
+)
+from gitmopy.utils import (
+    APP_PATH,
+    HISTORY_PATH,
+    CONFIG_PATH,
+    load_config,
+    message_from_commit_dict,
+    print_staged_files,
+    resolve_path,
+)
 
 app = typer.Typer()
+gitmojis_setup()
 
 
-def get_staged(repo):
+def get_staged(repo: Repo) -> List[str]:
+    """
+    Get staged files from a GitPython repository.
+
+    Args:
+        repo (git.Repo): Repository to get staged files from.
+
+    Returns:
+        List[str]: File paths of staged files.
+    """
     return [item.a_path for item in repo.index.diff("HEAD")]
 
 
-def get_unstaged(repo):
+def get_unstaged(repo: Repo) -> List[str]:
+    """
+    Get unstaged files from a GitPython repository.
+
+    Args:
+        repo (git.Repo): Repository to get unstaged files from.
+
+    Returns:
+        List[str]: File paths of unstaged files.
+    """
     return [item.a_path for item in repo.index.diff(None)]
 
 
-def get_untracked(repo):
+def get_untracked(repo: Repo) -> List[str]:
+    """
+    Get untracked files from a GitPython repository.
+
+    Args:
+        repo (git.Repo): Repository to get untracked files from.
+
+    Returns:
+        List[str]: File paths of untracked files.
+    """
     return [item for item in repo.untracked_files]
 
 
-def get_files_status(repo):
+def get_files_status(repo: Repo) -> Dict[str, List[str]]:
+    """
+    Make a dictionnary of the files' status in a GitPython repository.
+    Keys are "staged", "unstaged" and "untracked".
+    Values are lists of file paths.
+
+    Args:
+        repo (git.Repo): Repository to get files' status from.
+
+    Returns:
+        Dict[str, List[str]]: Dictionnary of files' status.
+    """
     return {
         "staged": get_staged(repo),
         "unstaged": get_unstaged(repo),
@@ -42,17 +97,29 @@ def commit(
             help="Whether or not to add all unstaged files if none is already staged"
         ),
     ] = False,
-    # push: Annotated[
-    #     str,
-    #     typer.Option(
-    #         help="Where to push after the commit (for instance: 'origin master)."
-    #         + "Quotes must be used. Disabled by default."
-    #     ),
-    # ] = None,
+    push: Annotated[
+        bool,
+        typer.Option(help="Whether to `git push` after commit. Disabled by default."),
+    ] = None,
     dry: Annotated[
         bool, typer.Option(help="Whether or not to actually commit.")
     ] = False,
 ):
+    """
+    Main command: commit staged files, and staging files if need be.
+
+    Args:
+        repo (str, optional): Path to the git repository. Defaults to ".".
+        add (bool, optional): Whether or not to select unstaged files to add
+            if none is already staged. Defaults to False.
+        dry (bool, optional): Whether or not to actually commit.
+            Defaults to False.
+
+    Raises:
+        typer.Exit: Path to repository is not a Git repository.
+        typer.Exit: No staged files and user does not want to add.
+        typer.Exit: User asked for a dry run.
+    """
     # resolve repository path
     repo_path = resolve_path(repo)
     repo_ok = False
@@ -100,50 +167,77 @@ def commit(
 
     # PROMPT: get user's commit details
     print("\n[u green3]Commit details:[/u green3]")
-    cd = commit_prompt(config)
+    commit_dict = commit_prompt(config)
 
-    commit_message = (
-        f"{cd['emoji']} ({cd['scope']}): {cd['title']}\n\n{cd['message']}"
-        if cd["scope"]
-        else f"{cd['emoji']} {cd['title']}\n\n{cd['message']}"
-    ).strip()
+    # make commit messsage
+    commit_message = message_from_commit_dict(commit_dict)
 
     if dry:
+        # Don't do anything, just print the commit message
         print("\nFormatted commit:\n```")
         print(commit_message)
         print("```")
         raise typer.Exit(0)
 
     if config["enable_history"]:
-        save_to_history(cd)
+        # save commit details to history
+        save_to_history(commit_dict)
 
+    # commit
     repo.index.commit(commit_message)
 
-    # if push == "":
-    #     typer.echo("Pushing to origin...")
-    #     origin = repo.remote(name="origin")
-    #     origin.push()
-    # elif push is not None:
-    #     typer.echo(f"Pushing to {push}...")
-    #     dest, branch = push.split(" ")
-    #     repo.git.push(dest, branch)
+    if push:
+        if len(repo.remotes) > 1:
+            # PROMPT: choose remote
+            selected_remotes = choose_remote_prompt(repo.remotes)
+            if not selected_remotes:
+                print("[yellow]No remote selected. Aborting.[/yellow]")
+                raise typer.Exit(1)
+            selected_remotes = set(selected_remotes)
+            for remote in repo.remotes:
+                if remote.name in selected_remotes:
+                    remote.push()
+        elif len(repo.remotes) == 0:
+            print("[yellow]No remote found. Ignoring push.[/yellow]")
+        else:
+            remote_name = repo.remotes[0].name
+            print(f"\n[dodger_blue3]Pushing to remote {remote_name}[/dodger_blue3]")
+            repo.remotes[0].push()
     print("\nDone 🥳\n")
 
 
 @app.command(
     help="Configure gitmopy",
 )
-def setup():
-    setup_prompt()
+def config():
+    """
+    Command to setup gitmopy's configuration.
+    """
+    config_prompt()
 
 
 @app.command(
-    help="Print version",
+    help="Print gitmopy info",
 )
-def version():
+def info():
+    """
+    Command to print gitmopy's info.
+    """
     import gitmopy
 
-    print(gitmopy.__version__)
+    print("\n[b u green3]gitmopy info:[/b u green3]")
+    print("  version :", gitmopy.__version__)
+    print("  app path:", str(APP_PATH))
+    if HISTORY_PATH.exists():
+        print("  history :", str(HISTORY_PATH))
+    if CONFIG_PATH:
+        print("  config  :", str(CONFIG_PATH))
+    config = load_config()
+    print("\n[b u green3]Current configuration:[/b u green3]")
+    max_l = max([len(k) for k in config.keys()])
+    for k, v in config.items():
+        print(f"  {k:{max_l}}: {v}")
+    print()
 
 
 if __name__ == "__main__":
