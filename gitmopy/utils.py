@@ -19,7 +19,7 @@ def resolve_path(path: Union[str, Path]) -> Path:
     return Path(expandvars(path)).expanduser().resolve()
 
 
-APP_PATH = resolve_path(typer.get_app_dir("gitmopy"))
+APP_PATH = resolve_path(typer.get_app_dir("gitmopy", force_posix=True))
 """
 Path to the application directory.
 """
