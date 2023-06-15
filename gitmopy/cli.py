@@ -198,7 +198,7 @@ def commit(
             print("[yellow]No remote found. Ignoring push.[/yellow]")
         else:
             remote_name = repo.remotes[0].name
-            print(f"[dodger_blue3]Pushing to remote {remote_name}[/dodger_blue3]")
+            print(f"\n[dodger_blue3]Pushing to remote {remote_name}[/dodger_blue3]")
             repo.remotes[0].push()
     print("\nDone 🥳\n")
 
