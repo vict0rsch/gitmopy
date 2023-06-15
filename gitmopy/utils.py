@@ -1,16 +1,28 @@
 from os.path import expandvars
 from pathlib import Path
-from typing import Union
+from typing import Union, List, Dict
 from yaml import safe_load, safe_dump
 from rich import print
 import typer
 
 
 def resolve_path(path: Union[str, Path]) -> Path:
+    """
+    Resolve a path with ``expandvars``, ``expanduser`` and ``resolve``.
+
+    Args:
+        path (Union[str, Path]): Path to resolve.
+
+    Returns:
+        Path: Resolved (absolute) path.
+    """
     return Path(expandvars(path)).expanduser().resolve()
 
 
 APP_PATH = resolve_path(typer.get_app_dir("gitmopy"))
+"""
+Path to the application directory.
+"""
 
 DEFAULT_CHOICES = [
     {
@@ -35,17 +47,38 @@ DEFAULT_CHOICES = [
         "default": True,
     },
 ]
+"""
+Choices for the setup prompt.
+"""
+
 DEFAULT_CONFIG = {c["value"]: c["default"] for c in DEFAULT_CHOICES}
+"""
+Default gitmopy configuration.
+"""
 
 
-def load_config():
+def load_config() -> Dict[str, bool]:
+    """
+    Load the configuration from ``${APP_PATH}/config.yaml``.
+    Returns the default configuration if the file does not exist.
+
+    Returns:
+        Dict[str, bool]: User gitmopy configuration.
+    """
     yaml_path = APP_PATH / "config.yaml"
     if yaml_path.exists():
         return {**DEFAULT_CONFIG, **safe_load(yaml_path.read_text())}
     return DEFAULT_CONFIG
 
 
-def save_config(config):
+def save_config(config: Dict[str, bool]) -> None:
+    """
+    Save the configuration to ``${APP_PATH}/config.yaml``.
+    Creates the parent directory if it does not exist.
+
+    Args:
+        config (Dict[str, bool]): Current gitmopy configuration.
+    """
     yaml_path = APP_PATH / "config.yaml"
     if not yaml_path.exists():
         print("[bold yellow] Creating config file [/bold yellow]", str(yaml_path))
@@ -54,7 +87,13 @@ def save_config(config):
     print("✅ Config updated")
 
 
-def print_staged_files(staged):
+def print_staged_files(staged: List[str]) -> None:
+    """
+    Print the currently staged files with Rich colours.
+
+    Args:
+        staged (List[str]): List of staged files paths.
+    """
     nst = len(staged)
     s = "" if nst == 1 else "s"
     print(f"[green3]Currently {nst} staged file{s} for commit:[/green3]")
@@ -649,3 +688,7 @@ GITMOJIS = [
         "semver": "",
     },
 ]
+"""
+List of emojis and their code and description according
+to https://gitmoji.dev/
+"""

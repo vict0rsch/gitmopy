@@ -7,31 +7,32 @@ from gitmopy import history as gmp_history
 from gitmopy.utils import load_config, save_config, DEFAULT_CHOICES, APP_PATH, GITMOJIS
 
 
-def emo_setup():
+def emo_setup() -> None:
+    """
+    Setup the emoji list.
+    Adds a "name" and "value" key to each emoji.
+    """
     global GITMOJIS
 
     for e in GITMOJIS:
-        e["match_str"] = "".join(e.values())
         e["name"] = e["emoji"] + " " + e["description"]
         e["value"] = e["emoji"]
-        e["count"] = 0
     gmp_history.load_history()
     GITMOJIS = gmp_history.sort_emojis(GITMOJIS)
 
 
-def match_emojis(match, fuzzy=False):
-    global GITMOJIS
-
-    return [
-        e
-        for e in GITMOJIS
-        if fuzzysearch.find_near_matches(match, e["match_str"], max_l_dist=int(fuzzy))
-    ]
-
-
 class GMPCompleter(Completer):
-    def __init__(self, key):
+    def __init__(self, key, max_results=10):
+        """
+        A completer that completes a text prompt from the user's history.
+        Completions are sorted by most recent first.
+        Returns up to ``self.max_results`` results.
+
+        Args:
+            key (str): Key to complete from. Must be one of "scope", "title", "message".
+        """
         self.key = key
+        self.max_results = max_results
         self.candidates = {}
         for c in gmp_history.HISTORY:
             if c[key] not in self.candidates:
@@ -41,6 +42,21 @@ class GMPCompleter(Completer):
         super().__init__()
 
     def get_completions(self, document, complete_event):
+        """
+        Get completions for the current prompt.
+
+        A completion is a string from the user's history that starts with all
+        the characters in the current prompt.
+
+        Case insensitive.
+
+        Args:
+            document (prompt_toolkit. ): The current document from the prompt.
+            complete_event (Any): Unused.
+
+        Yields:
+            Completion: A completion object that replaces the current user's input.
+        """
         matched = sorted(
             [
                 (k, v)
@@ -50,11 +66,32 @@ class GMPCompleter(Completer):
             key=lambda x: x[1],
             reverse=True,
         )
-        for m in matched[:10]:
+        for m in matched[: self.max_results]:
             yield Completion(m[0], start_position=-len(document.text))
 
 
 def commit_prompt(config):
+    """
+    Prompt the user for a commit message in up to 4 steps:
+    - Select gitmoji
+    - Select scope
+    - Enter title
+    - Enter message
+
+    Scope and message are optional.
+    Scope and message can be bypassed from the config (run ``gitmopy config``)
+    Scope, title and message are completed from the user's history if
+        ``config["enable_history"]`` is ``True``.
+
+    Args:
+        config (dict): Configuration dictionary, from ``gitmopy config``.
+
+    Returns:
+        dict: User-specified commit as a dict with keys
+            ``"emoji"``, ``"scope"``, ``"title"``, ``"message"``.
+    """
+
+    # get the commit's gitmoji
     emoji = (
         inquirer.fuzzy(
             message="Select gitmoji:",
@@ -72,6 +109,7 @@ def commit_prompt(config):
     scope = message = ""
 
     if not config["skip_scope"]:
+        # get the commit's scope
         scope = (
             inquirer.text(
                 message="Select scope (optional):",
@@ -84,6 +122,7 @@ def commit_prompt(config):
             .strip()
         )
 
+    # get the commit's title
     title = (
         inquirer.text(
             message="Commit title:",
@@ -100,10 +139,12 @@ def commit_prompt(config):
         .execute()
         .strip()
     )
+    # Capitalize the title if the user wants to (from config)
     if config["capitalize_title"]:
         title = title.capitalize()
 
     if not config["skip_message"]:
+        # get the commit's message
         message = (
             inquirer.text(
                 message="Commit details (optional):",
@@ -116,6 +157,7 @@ def commit_prompt(config):
             .strip()
         )
 
+    # return commit details as a dict
     return {
         "emoji": emoji,
         "scope": scope,
@@ -125,6 +167,16 @@ def commit_prompt(config):
 
 
 def setup_prompt():
+    """
+    Prompt the user for configuration options.
+    Will setup:
+    - Whether to skip scope
+    - Whether to skip message
+    - Whether to capitalize title
+    - Whether to enable history
+
+    Will save the configuration in ``${APP_PATH}/config.yaml``.
+    """
     config = load_config()
 
     choices = [
@@ -152,6 +204,19 @@ def setup_prompt():
 
 
 def git_add_prompt(status):
+    """
+    Start a prompt to select files to add to the commit.
+
+    Files are grouped by status (unstaged, untracked).
+
+    Files are all selected by default.
+
+    Args:
+        status (dict): Dictionary of files grouped by status.
+
+    Returns:
+        list: List of all the files selected by the user.
+    """
     choices = []
     for s in status["unstaged"]:
         choices.append(Choice(s, f"{s} -- unstaged", True))
@@ -170,6 +235,3 @@ def git_add_prompt(status):
     ).execute()
 
     return selected
-
-
-emo_setup()

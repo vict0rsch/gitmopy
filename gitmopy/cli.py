@@ -1,28 +1,69 @@
 import git
+from git import Repo
 import typer
+from typing import List, Dict
 from typing_extensions import Annotated
 from rich import print
 
-from gitmopy.prompt import commit_prompt, setup_prompt, git_add_prompt
+from gitmopy.prompt import commit_prompt, setup_prompt, git_add_prompt, emo_setup
 from gitmopy.utils import resolve_path, load_config, print_staged_files
 from gitmopy.history import save_to_history
 
 app = typer.Typer()
+emo_setup()
 
 
-def get_staged(repo):
+def get_staged(repo: Repo) -> List[str]:
+    """
+    Get staged files from a GitPython repository.
+
+    Args:
+        repo (git.Repo): Repository to get staged files from.
+
+    Returns:
+        List[str]: File paths of staged files.
+    """
     return [item.a_path for item in repo.index.diff("HEAD")]
 
 
-def get_unstaged(repo):
+def get_unstaged(repo: Repo) -> List[str]:
+    """
+    Get unstaged files from a GitPython repository.
+
+    Args:
+        repo (git.Repo): Repository to get unstaged files from.
+
+    Returns:
+        List[str]: File paths of unstaged files.
+    """
     return [item.a_path for item in repo.index.diff(None)]
 
 
-def get_untracked(repo):
+def get_untracked(repo: Repo) -> List[str]:
+    """
+    Get untracked files from a GitPython repository.
+
+    Args:
+        repo (git.Repo): Repository to get untracked files from.
+
+    Returns:
+        List[str]: File paths of untracked files.
+    """
     return [item for item in repo.untracked_files]
 
 
-def get_files_status(repo):
+def get_files_status(repo: Repo) -> Dict[str, List[str]]:
+    """
+    Make a dictionnary of the files' status in a GitPython repository.
+    Keys are "staged", "unstaged" and "untracked".
+    Values are lists of file paths.
+
+    Args:
+        repo (git.Repo): Repository to get files' status from.
+
+    Returns:
+        Dict[str, List[str]]: Dictionnary of files' status.
+    """
     return {
         "staged": get_staged(repo),
         "unstaged": get_unstaged(repo),
@@ -53,6 +94,21 @@ def commit(
         bool, typer.Option(help="Whether or not to actually commit.")
     ] = False,
 ):
+    """
+    Main command: commit staged files, and staging files if need be.
+
+    Args:
+        repo (str, optional): Path to the git repository. Defaults to ".".
+        add (bool, optional): Whether or not to select unstaged files to add
+            if none is already staged. Defaults to False.
+        dry (bool, optional): Whether or not to actually commit.
+            Defaults to False.
+
+    Raises:
+        typer.Exit: Path to repository is not a Git repository.
+        typer.Exit: No staged files and user does not want to add.
+        typer.Exit: User asked for a dry run.
+    """
     # resolve repository path
     repo_path = resolve_path(repo)
     repo_ok = False
@@ -102,6 +158,7 @@ def commit(
     print("\n[u green3]Commit details:[/u green3]")
     cd = commit_prompt(config)
 
+    # make commit messsage
     commit_message = (
         f"{cd['emoji']} ({cd['scope']}): {cd['title']}\n\n{cd['message']}"
         if cd["scope"]
@@ -109,14 +166,17 @@ def commit(
     ).strip()
 
     if dry:
+        # Don't do anything, just print the commit message
         print("\nFormatted commit:\n```")
         print(commit_message)
         print("```")
         raise typer.Exit(0)
 
     if config["enable_history"]:
+        # save commit details to history
         save_to_history(cd)
 
+    # commit
     repo.index.commit(commit_message)
 
     # if push == "":
@@ -134,6 +194,9 @@ def commit(
     help="Configure gitmopy",
 )
 def setup():
+    """
+    Command to setup gitmopy's configuration.
+    """
     setup_prompt()
 
 
@@ -141,6 +204,9 @@ def setup():
     help="Print version",
 )
 def version():
+    """
+    Command to print gitmopy's version.
+    """
     import gitmopy
 
     print(gitmopy.__version__)
