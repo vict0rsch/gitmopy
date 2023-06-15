@@ -1,3 +1,4 @@
+from typing import List
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice, Separator
 from prompt_toolkit.completion import Completer, Completion
@@ -232,6 +233,21 @@ def git_add_prompt(status):
         transformer=lambda result: "",
         qmark="❓",
         amark="✓",
+    ).execute()
+
+    return selected
+
+
+def choose_remote_prompt(remotes: List[str]) -> List[str]:
+    choices = [Choice(r.name, r.name, True) for r in remotes]
+    selected = inquirer.checkbox(
+        "Select remotes to push to:",
+        instruction="Use 'space' to (de-)select, 'enter' to validate.",
+        choices=choices,
+        cycle=True,
+        qmark="❓",
+        amark="✓",
+        transformer=lambda result: "Pushing to " + ", ".join(result),
     ).execute()
 
     return selected

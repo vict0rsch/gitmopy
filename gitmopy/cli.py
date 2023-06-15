@@ -5,7 +5,13 @@ from typing import List, Dict
 from typing_extensions import Annotated
 from rich import print
 
-from gitmopy.prompt import commit_prompt, config_prompt, git_add_prompt, gitmojis_setup
+from gitmopy.prompt import (
+    commit_prompt,
+    config_prompt,
+    git_add_prompt,
+    gitmojis_setup,
+    choose_remote_prompt,
+)
 from gitmopy.utils import (
     resolve_path,
     APP_PATH,
@@ -89,13 +95,10 @@ def commit(
             help="Whether or not to add all unstaged files if none is already staged"
         ),
     ] = False,
-    # push: Annotated[
-    #     str,
-    #     typer.Option(
-    #         help="Where to push after the commit (for instance: 'origin master)."
-    #         + "Quotes must be used. Disabled by default."
-    #     ),
-    # ] = None,
+    push: Annotated[
+        bool,
+        typer.Option(help="Whether to `git push` after commit. Disabled by default."),
+    ] = None,
     dry: Annotated[
         bool, typer.Option(help="Whether or not to actually commit.")
     ] = False,
@@ -181,14 +184,23 @@ def commit(
     # commit
     repo.index.commit(commit_message)
 
-    # if push == "":
-    #     typer.echo("Pushing to origin...")
-    #     origin = repo.remote(name="origin")
-    #     origin.push()
-    # elif push is not None:
-    #     typer.echo(f"Pushing to {push}...")
-    #     dest, branch = push.split(" ")
-    #     repo.git.push(dest, branch)
+    if push:
+        if len(repo.remotes) > 1:
+            # PROMPT: choose remote
+            selected_remotes = choose_remote_prompt(repo.remotes)
+            if not selected_remotes:
+                print("[yellow]No remote selected. Aborting.[/yellow]")
+                raise typer.Exit(1)
+            selected_remotes = set(selected_remotes)
+            for remote in repo.remotes:
+                if remote.name in selected_remotes:
+                    remote.push()
+        elif len(repo.remotes) == 0:
+            print("[yellow]No remote found. Ignoring push.[/yellow]")
+        else:
+            remote_name = repo.remotes[0].name
+            print(f"[dodger_blue3]Pushing to remote {remote_name}[/dodger_blue3]")
+            repo.remotes[0].push()
     print("\nDone 🥳\n")
 
 
