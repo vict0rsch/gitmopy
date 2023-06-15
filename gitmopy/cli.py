@@ -86,15 +86,16 @@ def get_files_status(repo: Repo) -> Dict[str, List[str]]:
 
 
 @app.command(
-    help="Commit staged files. Use --add to add all"
-    + " unstaged files if none is already staged",
+    help="Commit staged files. Use --add to interactively select files to"
+    + " stage if none is already staged",
 )
 def commit(
     repo: Annotated[str, typer.Option(help="Path to the git repository")] = ".",
     add: Annotated[
         bool,
         typer.Option(
-            help="Whether or not to add all unstaged files if none is already staged"
+            help="Whether or not to interactively select files to"
+            + " stage if none is already staged"
         ),
     ] = False,
     push: Annotated[

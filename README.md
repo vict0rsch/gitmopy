@@ -45,37 +45,35 @@ $ gitmopy --help
 
  Usage: gitmopy [OPTIONS] COMMAND [ARGS]...
 
-╭─ Options ──────────────────────────────────────────────────────────────────╮
-│ --install-completion          Install completion for the current shell.    │
-│ --show-completion             Show completion for the current shell, to    │
-│                               copy it or customize the installation.       │
-│ --help                        Show this message and exit.                  │
-╰────────────────────────────────────────────────────────────────────────────╯
-╭─ Commands ─────────────────────────────────────────────────────────────────╮
-│ commit  Commit staged files. Use --add to add all unstaged files if none   │
-│         is already staged                                                  │
-│ config  Configure gitmopy                                                  │
-│ info    Print gitmopy info                                                 │
-╰────────────────────────────────────────────────────────────────────────────╯
-
+╭─ Options ───────────────────────────────────────────────────────────────────────────╮
+│ --install-completion          Install completion for the current shell.             │
+│ --show-completion             Show completion for the current shell, to copy it or  │
+│                               customize the installation.                           │
+│ --help                        Show this message and exit.                           │
+╰─────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ──────────────────────────────────────────────────────────────────────────╮
+│ commit  Commit staged files. Use --add to interactively select files to stage if    │
+│         none is already staged                                                      │
+│ config  Configure gitmopy                                                           │
+│ info    Print gitmopy info                                                          │
+╰─────────────────────────────────────────────────────────────────────────────────────╯
 
 $ gitmopy commit --help
 
  Usage: gitmopy commit [OPTIONS]
 
- Commit staged files. Use --add to add all unstaged files if none is already
- staged
+ Commit staged files. Use --add to interactively select files to stage if none is
+ already staged
 
-╭─ Options ──────────────────────────────────────────────────────────────────╮
-│ --repo                 TEXT  Path to the git repository [default: .]       │
-│ --add     --no-add           Whether or not to add all unstaged files if   │
-│                              none is already staged                        │
-│                              [default: no-add]                             │
-│ --push    --no-push          Whether to `git push` after commit. Disabled  │
-│                              by default.                                   │
-│                              [default: no-push]                            │
-│ --dry     --no-dry           Whether or not to actually commit.            │
-│                              [default: no-dry]                             │
-│ --help                       Show this message and exit.                   │
-╰────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ───────────────────────────────────────────────────────────────────────────╮
+│ --repo                 TEXT  Path to the git repository [default: .]                │
+│ --add     --no-add           Whether or not to interactively select files to stage  │
+│                              if none is already staged                              │
+│                              [default: no-add]                                      │
+│ --push    --no-push          Whether to `git push` after commit. Disabled by        │
+│                              default.                                               │
+│                              [default: no-push]                                     │
+│ --dry     --no-dry           Whether or not to actually commit. [default: no-dry]   │
+│ --help                       Show this message and exit.                            │
+╰─────────────────────────────────────────────────────────────────────────────────────╯
 ```
