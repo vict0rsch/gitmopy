@@ -56,20 +56,6 @@ class GMPCompleter(Completer):
             yield Completion(m[0], start_position=-len(document.text))
 
 
-def gitmojis_setup() -> None:
-    """
-    Setup the emoji list.
-    Adds a "name" and "value" key to each emoji.
-    """
-    global GITMOJIS
-
-    for e in GITMOJIS:
-        e["name"] = e["emoji"] + " " + e["description"]
-        e["value"] = e["emoji"]
-    gmp_history.load_history()
-    GITMOJIS = gmp_history.sort_emojis(GITMOJIS)
-
-
 def commit_prompt(config):
     """
     Prompt the user for a commit message in up to 4 steps:

@@ -1,5 +1,5 @@
 import json
-from gitmopy.utils import APP_PATH
+from gitmopy.utils import APP_PATH, GITMOJIS, load_config
 from typing import Dict, List, Optional
 from datetime import datetime
 from rich import print
@@ -120,3 +120,22 @@ def sort_emojis(
         dater[commit["emoji"]] = commit["timestamp"]
     gitmojis = sorted(gitmojis, key=lambda x: dater.get(x["emoji"], 0), reverse=True)
     return gitmojis
+
+
+def gitmojis_setup() -> None:
+    """
+    Setup the emoji list.
+    Adds a "name" and "value" key to each emoji.
+    """
+    global GITMOJIS
+
+    config = load_config()
+
+    if not config["enable_history"]:
+        return
+
+    for e in GITMOJIS:
+        e["name"] = e["emoji"] + " " + e["description"]
+        e["value"] = e["emoji"]
+    load_history()
+    GITMOJIS = sort_emojis(GITMOJIS)

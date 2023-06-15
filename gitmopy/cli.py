@@ -9,7 +9,6 @@ from gitmopy.prompt import (
     commit_prompt,
     config_prompt,
     git_add_prompt,
-    gitmojis_setup,
     choose_remote_prompt,
 )
 from gitmopy.utils import (
@@ -19,7 +18,7 @@ from gitmopy.utils import (
     print_staged_files,
     message_from_commit_dict,
 )
-from gitmopy.history import save_to_history
+from gitmopy.history import save_to_history, gitmojis_setup
 
 app = typer.Typer()
 gitmojis_setup()
