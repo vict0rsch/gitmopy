@@ -195,8 +195,10 @@ def commit(
         typer.Exit: No staged files and user does not want to add.
         typer.Exit: User asked for a dry run.
     """
+    repo_str = str(repo)
     while True:
         # resolve repository path
+        repo = repo_str
         repo_path = resolve_path(repo)
         repo_ok = False
         # load repo from path
