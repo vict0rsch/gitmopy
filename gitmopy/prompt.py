@@ -226,6 +226,7 @@ def git_add_prompt(status):
 
     selected = inquirer.checkbox(
         message="Select files to add for the commit.",
+        instruction="Use 'space' to (de-)select, 'enter' to validate.",
         choices=choices,
         cycle=True,
         transformer=lambda result: "",
