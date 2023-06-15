@@ -8,6 +8,7 @@ from typing import Dict, List, Union
 import typer
 from rich import print
 from yaml import safe_dump, safe_load
+from InquirerPy.separator import Separator
 
 
 def resolve_path(path: Union[str, Path]) -> Path:
@@ -139,6 +140,17 @@ def message_from_commit_dict(commit_dict: Dict[str, str]) -> str:
         message += f"({commit_dict['scope']}): "
     message += f"{commit_dict['title']}\n\n{commit_dict['message']}"
     return message.strip()
+
+
+def separator(title: str = "", width: int = 30, sep: str = "-") -> Separator:
+    assert sep
+    assert width > 0
+    if len(title) > width - 4:
+        width = len(title) + 4
+
+    first = (width - len(title)) // 2
+    line = f"{sep * first} {title} {sep * (width - first - len(title) - 2)}"
+    return Separator(line)
 
 
 # https://github.com/carloscuesta/gitmoji/blob/master/packages/gitmojis/src/gitmojis.json

@@ -7,12 +7,19 @@ Prompts typically parameterize the commit message or ``gitmopy``'s behavior.
 from typing import Any, Dict, List, Optional
 
 from InquirerPy import inquirer
-from InquirerPy.base.control import Choice, Separator
+from InquirerPy.base.control import Choice
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.document import Document
 
 from gitmopy import history as gmp_history
-from gitmopy.utils import APP_PATH, DEFAULT_CHOICES, GITMOJIS, load_config, save_config
+from gitmopy.utils import (
+    APP_PATH,
+    DEFAULT_CHOICES,
+    GITMOJIS,
+    load_config,
+    save_config,
+    separator,
+)
 
 
 class GMPCompleter(Completer):
@@ -211,12 +218,15 @@ def git_add_prompt(status: Dict[str, List[str]]) -> List[str]:
         list: List of all the files selected by the user.
     """
     choices = []
+    if len(status["unstaged"]) > 0:
+        choices.append(separator("Unstaged files"))
     for s in status["unstaged"]:
-        choices.append(Choice(s, f"{s} -- unstaged", True))
-    if len(choices) > 0:
-        choices.append(Separator())
+        choices.append(Choice(s, s, True))
+
+    if len(status["untracked"]) > 0:
+        choices.append(separator("Untracked files"))
     for s in status["untracked"]:
-        choices.append(Choice(s, f"{s} -- untracked", True))
+        choices.append(Choice(s, s, True))
 
     selected = inquirer.checkbox(
         message="Select files to add for the commit.",
