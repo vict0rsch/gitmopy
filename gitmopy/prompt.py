@@ -166,7 +166,7 @@ def commit_prompt(config):
     }
 
 
-def setup_prompt():
+def config_prompt():
     """
     Prompt the user for configuration options.
     Will setup:
@@ -185,8 +185,8 @@ def setup_prompt():
     ]
 
     selected = inquirer.checkbox(
-        message="Setup gitmopy locally.",
-        instruction="Use 'space' to (de-)select.",
+        message="Configure gitmopy locally.",
+        instruction="Use 'space' to (de-)select, 'enter' to validate.",
         long_instruction=f"Config will be saved in {str(APP_PATH)}/config.yaml.",
         choices=choices,
         cycle=True,

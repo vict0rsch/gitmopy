@@ -5,7 +5,7 @@ from typing import List, Dict
 from typing_extensions import Annotated
 from rich import print
 
-from gitmopy.prompt import commit_prompt, setup_prompt, git_add_prompt, emo_setup
+from gitmopy.prompt import commit_prompt, config_prompt, git_add_prompt, emo_setup
 from gitmopy.utils import resolve_path, load_config, print_staged_files
 from gitmopy.history import save_to_history
 
@@ -193,11 +193,11 @@ def commit(
 @app.command(
     help="Configure gitmopy",
 )
-def setup():
+def config():
     """
     Command to setup gitmopy's configuration.
     """
-    setup_prompt()
+    config_prompt()
 
 
 @app.command(
