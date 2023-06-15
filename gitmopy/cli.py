@@ -27,6 +27,22 @@ app = typer.Typer()
 gitmojis_setup()
 
 
+class CatchRemoteException:
+    def __init__(self, remote: str):
+        self.remote = remote
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type is git.exc.GitCommandError:
+            print(
+                f"[bold red]Error:[/bold red] could not push to {self.remote}:",
+            )
+            print(exc_value)
+        return True
+
+
 def get_staged(repo: Repo) -> List[str]:
     """
     Get staged files from a GitPython repository.
@@ -188,22 +204,26 @@ def commit(
     repo.index.commit(commit_message)
 
     if push:
-        if len(repo.remotes) > 1:
-            # PROMPT: choose remote
-            selected_remotes = choose_remote_prompt(repo.remotes)
-            if not selected_remotes:
-                print("[yellow]No remote selected. Aborting.[/yellow]")
-                raise typer.Exit(1)
-            selected_remotes = set(selected_remotes)
-            for remote in repo.remotes:
-                if remote.name in selected_remotes:
-                    remote.push()
-        elif len(repo.remotes) == 0:
+        if len(repo.remotes) == 0:
             print("[yellow]No remote found. Ignoring push.[/yellow]")
         else:
-            remote_name = repo.remotes[0].name
-            print(f"\n[dodger_blue3]Pushing to remote {remote_name}[/dodger_blue3]")
-            repo.remotes[0].push()
+            selected_remotes = set([repo.remotes[0].name])
+            if len(repo.remotes) > 1:
+                # PROMPT: choose remote
+                selected_remotes = choose_remote_prompt(repo.remotes)
+                if not selected_remotes:
+                    print("[yellow]No remote selected. Aborting.[/yellow]")
+                    raise typer.Exit(1)
+                selected_remotes = set(selected_remotes)
+            print()
+            color = "dodger_blue3"
+            for remote in repo.remotes:
+                if remote.name in selected_remotes:
+                    print(
+                        f"[{color}]Pushing to remote {remote.name}[/{color}]",
+                    )
+                    with CatchRemoteException(remote.name):
+                        remote.push()
     print("\nDone 🥳\n")
 
 
