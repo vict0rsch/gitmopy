@@ -8,6 +8,7 @@ from rich import print
 from gitmopy.prompt import commit_prompt, config_prompt, git_add_prompt, emo_setup
 from gitmopy.utils import (
     resolve_path,
+    APP_PATH,
     load_config,
     print_staged_files,
     message_from_commit_dict,
@@ -202,15 +203,18 @@ def config():
 
 
 @app.command(
-    help="Print version",
+    help="Print gitmopy info",
 )
-def version():
+def info():
     """
-    Command to print gitmopy's version.
+    Command to print gitmopy's info.
     """
     import gitmopy
 
-    print(gitmopy.__version__)
+    print("\n[b u green3]gitmopy info:[/b u green3]")
+    print("  version  :", gitmopy.__version__)
+    print("  data path:", str(APP_PATH))
+    print()
 
 
 if __name__ == "__main__":
