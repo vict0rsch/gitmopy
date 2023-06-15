@@ -89,7 +89,7 @@ def should_continue() -> bool:
         bool: Whether the user wants to continue or not.
     """
     print(
-        "\nReady to commit again. Press [orange]q[/orange] to quit, "
+        "\nReady to commit again. Press [orange3]q[/orange3] to quit, "
         + "[green]enter[/green] to commit again"
     )
     should_stop = typer.prompt("q / enter", default="enter")
