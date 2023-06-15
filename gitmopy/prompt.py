@@ -6,20 +6,6 @@ from gitmopy import history as gmp_history
 from gitmopy.utils import load_config, save_config, DEFAULT_CHOICES, APP_PATH, GITMOJIS
 
 
-def emo_setup() -> None:
-    """
-    Setup the emoji list.
-    Adds a "name" and "value" key to each emoji.
-    """
-    global GITMOJIS
-
-    for e in GITMOJIS:
-        e["name"] = e["emoji"] + " " + e["description"]
-        e["value"] = e["emoji"]
-    gmp_history.load_history()
-    GITMOJIS = gmp_history.sort_emojis(GITMOJIS)
-
-
 class GMPCompleter(Completer):
     def __init__(self, key, max_results=10):
         """
@@ -67,6 +53,20 @@ class GMPCompleter(Completer):
         )
         for m in matched[: self.max_results]:
             yield Completion(m[0], start_position=-len(document.text))
+
+
+def gitmojis_setup() -> None:
+    """
+    Setup the emoji list.
+    Adds a "name" and "value" key to each emoji.
+    """
+    global GITMOJIS
+
+    for e in GITMOJIS:
+        e["name"] = e["emoji"] + " " + e["description"]
+        e["value"] = e["emoji"]
+    gmp_history.load_history()
+    GITMOJIS = gmp_history.sort_emojis(GITMOJIS)
 
 
 def commit_prompt(config):

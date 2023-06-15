@@ -5,7 +5,7 @@ from typing import List, Dict
 from typing_extensions import Annotated
 from rich import print
 
-from gitmopy.prompt import commit_prompt, config_prompt, git_add_prompt, emo_setup
+from gitmopy.prompt import commit_prompt, config_prompt, git_add_prompt, gitmojis_setup
 from gitmopy.utils import (
     resolve_path,
     APP_PATH,
@@ -16,7 +16,7 @@ from gitmopy.utils import (
 from gitmopy.history import save_to_history
 
 app = typer.Typer()
-emo_setup()
+gitmojis_setup()
 
 
 def get_staged(repo: Repo) -> List[str]:
