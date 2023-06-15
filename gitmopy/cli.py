@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import git
 import typer
@@ -122,11 +122,23 @@ def commit(
     ] = False,
     push: Annotated[
         bool,
-        typer.Option(help="Whether to `git push` after commit. Disabled by default."),
+        typer.Option(
+            help="Whether to `git push` after commit. If multiple remotes exist, "
+            + "you will be asked to interactively choose the ones to push to. "
+            + "Use --remote to skip interactive selection. Disabled by default."
+        ),
     ] = None,
     dry: Annotated[
         bool, typer.Option(help="Whether or not to actually commit.")
     ] = False,
+    remote: Annotated[
+        Optional[List[str]],
+        typer.Option(
+            help="Remote to push to after commit. Use to skip interactive remote"
+            + " selection when several exist. Use several '--remote {remote name}' "
+            + "to push to multiple remotes"
+        ),
+    ] = None,
 ):
     """
     Main command: commit staged files, and staging files if need be.
@@ -164,11 +176,15 @@ def commit(
         # no staged files and user does not want to add: abort
         if not status["staged"] and not add:
             print(
-                "[yellow]"
+                "\n[yellow]"
                 + "No staged files. Stage files yourself or use [b]--add[/b]"
-                + " to add all unstaged files.[/yellow]"
+                + " to add all unstaged files.[/yellow]\n"
             )
             raise typer.Exit(1)
+        if remote is not None and not push:
+            print(
+                "\n[yellow]Ignoring --remote flag because --push is not set[/yellow]\n"
+            )
         # no staged files fbut user wants to add: start prompt
         if not status["staged"] and add:
             # PROMPT: list files to user and add their selection
@@ -216,7 +232,10 @@ def commit(
             selected_remotes = set([repo.remotes[0].name])
             if len(repo.remotes) > 1:
                 # PROMPT: choose remote
-                selected_remotes = choose_remote_prompt(repo.remotes)
+                if remote:
+                    selected_remotes = set(remote)
+                else:
+                    selected_remotes = choose_remote_prompt(repo.remotes)
                 if not selected_remotes:
                     print("[yellow]No remote selected. Aborting.[/yellow]")
                     raise typer.Exit(1)
