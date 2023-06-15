@@ -130,11 +130,12 @@ def gitmojis_setup() -> None:
 
     config = load_config()
 
+    for k, e in enumerate(GITMOJIS):
+        GITMOJIS[k]["name"] = e["emoji"] + " " + e["description"]
+        GITMOJIS[k]["value"] = e["emoji"]
+
     if not config["enable_history"]:
         return
 
-    for e in GITMOJIS:
-        e["name"] = e["emoji"] + " " + e["description"]
-        e["value"] = e["emoji"]
     load_history()
     GITMOJIS = sort_emojis(GITMOJIS)
