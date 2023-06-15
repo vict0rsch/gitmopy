@@ -74,14 +74,14 @@ def save_to_history(commit_dict, history=None):
     HISTORY_PATH.write_text(json.dumps(history))
 
 
-def sort_emojis(emodata, history=None):
+def sort_emojis(gitmojis, history=None):
     """Sort emojis by usage in history"""
     if history is None:
         history = HISTORY
     dater = {}
     for commit in history:
         dater[commit["emoji"]] = commit["timestamp"]
-    emodata["gitmojis"] = sorted(
-        emodata["gitmojis"], key=lambda x: dater.get(x["emoji"], 0), reverse=True
+    gitmojis = sorted(
+        gitmojis, key=lambda x: dater.get(x["emoji"], 0), reverse=True
     )
-    return emodata
+    return gitmojis
