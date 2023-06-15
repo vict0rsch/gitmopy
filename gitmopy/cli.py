@@ -1,24 +1,16 @@
-import git
-from git import Repo
-import typer
-from typing import List, Dict
-from typing_extensions import Annotated
-from rich import print
+from typing import Dict, List
 
-from gitmopy.prompt import (
-    commit_prompt,
-    config_prompt,
-    git_add_prompt,
-    choose_remote_prompt,
-)
-from gitmopy.utils import (
-    resolve_path,
-    APP_PATH,
-    load_config,
-    print_staged_files,
-    message_from_commit_dict,
-)
-from gitmopy.history import save_to_history, gitmojis_setup
+import git
+import typer
+from git import Repo
+from rich import print
+from typing_extensions import Annotated
+
+from gitmopy.history import gitmojis_setup, save_to_history
+from gitmopy.prompt import (choose_remote_prompt, commit_prompt, config_prompt,
+                            git_add_prompt)
+from gitmopy.utils import (APP_PATH, load_config, message_from_commit_dict,
+                           print_staged_files, resolve_path)
 
 app = typer.Typer()
 gitmojis_setup()

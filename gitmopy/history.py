@@ -1,9 +1,10 @@
 import json
-from gitmopy.utils import APP_PATH, GITMOJIS, load_config
-from typing import Dict, List, Optional
 from datetime import datetime
+from typing import Dict, List, Optional
+
 from rich import print
 
+from gitmopy.utils import APP_PATH, GITMOJIS, load_config
 
 HISTORY_PATH = APP_PATH / "history.json"
 HISTORY = []

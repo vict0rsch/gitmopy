@@ -1,9 +1,10 @@
 from os.path import expandvars
 from pathlib import Path
-from typing import Union, List, Dict
-from yaml import safe_load, safe_dump
-from rich import print
+from typing import Dict, List, Union
+
 import typer
+from rich import print
+from yaml import safe_dump, safe_load
 
 
 def resolve_path(path: Union[str, Path]) -> Path:

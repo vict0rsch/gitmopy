@@ -1,11 +1,13 @@
-from typing import List, Optional, Any, Dict
+from typing import Any, Dict, List, Optional
+
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice, Separator
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.document import Document
 
 from gitmopy import history as gmp_history
-from gitmopy.utils import load_config, save_config, DEFAULT_CHOICES, APP_PATH, GITMOJIS
+from gitmopy.utils import (APP_PATH, DEFAULT_CHOICES, GITMOJIS, load_config,
+                           save_config)
 
 
 class GMPCompleter(Completer):
