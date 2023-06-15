@@ -1,4 +1,3 @@
-import fuzzysearch
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice, Separator
 from prompt_toolkit.completion import Completer, Completion

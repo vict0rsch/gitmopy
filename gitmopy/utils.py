@@ -101,6 +101,31 @@ def print_staged_files(staged: List[str]) -> None:
         print(f"  [grey66]- {f}[/grey66]")
 
 
+def message_from_commit_dict(commit_dict: Dict[str, str]) -> str:
+    """
+    Create a commit message from a commit dictionary.
+
+    Depending on whether ``scope`` is set, will look like
+
+    * ``{emoji} ({scope}): {title}``
+    * ``{emoji}: {title}``
+
+    Then ``\n\n{message}`` is appended if a message is specified.
+
+
+    Args:
+        commit_dict (Dict[str, str]): Commit specs from the prompt.
+
+    Returns:
+        str: formatted commit message.
+    """
+    message = f"{commit_dict['emoji']} "
+    if commit_dict["scope"]:
+        message += f"({commit_dict['scope']}): "
+    message += f"{commit_dict['title']}\n\n{commit_dict['message']}"
+    return message.strip()
+
+
 # https://github.com/carloscuesta/gitmoji/blob/master/packages/gitmojis/src/gitmojis.json
 GITMOJIS = [
     {

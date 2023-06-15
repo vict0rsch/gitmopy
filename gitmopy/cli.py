@@ -6,7 +6,12 @@ from typing_extensions import Annotated
 from rich import print
 
 from gitmopy.prompt import commit_prompt, config_prompt, git_add_prompt, emo_setup
-from gitmopy.utils import resolve_path, load_config, print_staged_files
+from gitmopy.utils import (
+    resolve_path,
+    load_config,
+    print_staged_files,
+    message_from_commit_dict,
+)
 from gitmopy.history import save_to_history
 
 app = typer.Typer()
@@ -156,14 +161,10 @@ def commit(
 
     # PROMPT: get user's commit details
     print("\n[u green3]Commit details:[/u green3]")
-    cd = commit_prompt(config)
+    commit_dict = commit_prompt(config)
 
     # make commit messsage
-    commit_message = (
-        f"{cd['emoji']} ({cd['scope']}): {cd['title']}\n\n{cd['message']}"
-        if cd["scope"]
-        else f"{cd['emoji']} {cd['title']}\n\n{cd['message']}"
-    ).strip()
+    commit_message = message_from_commit_dict(commit_dict)
 
     if dry:
         # Don't do anything, just print the commit message
