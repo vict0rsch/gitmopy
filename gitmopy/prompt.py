@@ -240,3 +240,12 @@ def choose_remote_prompt(remotes: List[str]) -> List[str]:
     ).execute()
 
     return selected
+
+
+def set_upstream_prompt(remote_name):
+    return inquirer.confirm(
+        f"Do you want to set the upstream branch for '{remote_name}' now?",
+        qmark="❓",
+        amark="✓",
+        default=True,
+    ).execute()

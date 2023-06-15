@@ -12,6 +12,7 @@ from gitmopy.prompt import (
     commit_prompt,
     config_prompt,
     git_add_prompt,
+    set_upstream_prompt,
 )
 from gitmopy.utils import (
     APP_PATH,
@@ -30,16 +31,21 @@ gitmojis_setup()
 class CatchRemoteException:
     def __init__(self, remote: str):
         self.remote = remote
+        self.error = False
+        self.set_upsteam = False
 
     def __enter__(self):
-        pass
+        return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is git.exc.GitCommandError:
+            self.error = True
+            self.set_upsteam = "has no upstream branch" in exc_value.stderr
             print(
                 f"[bold red]Error:[/bold red] could not push to {self.remote}:",
             )
-            print(exc_value)
+            print("[red]" + exc_value.stderr + "[/red]")
+
         return True
 
 
@@ -222,8 +228,18 @@ def commit(
                     print(
                         f"[{color}]Pushing to remote {remote.name}[/{color}]",
                     )
-                    with CatchRemoteException(remote.name):
+                    with CatchRemoteException(remote.name) as cre:
+                        repo.git.push(remote.name, repo.active_branch.name)
                         remote.push()
+                    if cre.set_upsteam:
+                        set_upstream = set_upstream_prompt(remote.name)
+                        if set_upstream:
+                            with CatchRemoteException(remote.name) as cre:
+                                repo.git.push(
+                                    "--set-upstream",
+                                    remote.name,
+                                    repo.active_branch.name,
+                                )
     print("\nDone 🥳\n")
 
 
