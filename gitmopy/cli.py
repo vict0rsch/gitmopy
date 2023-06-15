@@ -7,10 +7,21 @@ from rich import print
 from typing_extensions import Annotated
 
 from gitmopy.history import gitmojis_setup, save_to_history
-from gitmopy.prompt import (choose_remote_prompt, commit_prompt, config_prompt,
-                            git_add_prompt)
-from gitmopy.utils import (APP_PATH, load_config, message_from_commit_dict,
-                           print_staged_files, resolve_path)
+from gitmopy.prompt import (
+    choose_remote_prompt,
+    commit_prompt,
+    config_prompt,
+    git_add_prompt,
+)
+from gitmopy.utils import (
+    APP_PATH,
+    HISTORY_PATH,
+    CONFIG_PATH,
+    load_config,
+    message_from_commit_dict,
+    print_staged_files,
+    resolve_path,
+)
 
 app = typer.Typer()
 gitmojis_setup()
@@ -215,8 +226,17 @@ def info():
     import gitmopy
 
     print("\n[b u green3]gitmopy info:[/b u green3]")
-    print("  version  :", gitmopy.__version__)
-    print("  data path:", str(APP_PATH))
+    print("  version :", gitmopy.__version__)
+    print("  app path:", str(APP_PATH))
+    if HISTORY_PATH.exists():
+        print("  history :", str(HISTORY_PATH))
+    if CONFIG_PATH:
+        print("  config  :", str(CONFIG_PATH))
+    config = load_config()
+    print("\n[b u green3]Current configuration:[/b u green3]")
+    max_l = max([len(k) for k in config.keys()])
+    for k, v in config.items():
+        print(f"  {k:{max_l}}: {v}")
     print()
 
 

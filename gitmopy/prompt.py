@@ -6,8 +6,7 @@ from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.document import Document
 
 from gitmopy import history as gmp_history
-from gitmopy.utils import (APP_PATH, DEFAULT_CHOICES, GITMOJIS, load_config,
-                           save_config)
+from gitmopy.utils import APP_PATH, DEFAULT_CHOICES, GITMOJIS, load_config, save_config
 
 
 class GMPCompleter(Completer):

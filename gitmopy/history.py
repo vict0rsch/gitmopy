@@ -4,15 +4,14 @@ from typing import Dict, List, Optional
 
 from rich import print
 
-from gitmopy.utils import APP_PATH, GITMOJIS, load_config
+from gitmopy.utils import HISTORY_PATH, GITMOJIS, load_config
 
-HISTORY_PATH = APP_PATH / "history.json"
 HISTORY = []
 
 
 def load_history() -> List[Dict[str, str]]:
     """
-    Load history from ``${APP_PATH}/history.json`` file.
+    Load history from ``${HISTORY_PATH}`` file.
 
     Returns an empty list if the file does not exist.
     """
@@ -75,8 +74,7 @@ def save_to_history(
     commit_dict: Dict[str, str], history: Optional[List[Dict[str, str]]] = None
 ) -> None:
     """
-    Writes a commit dictionnary to the history file in
-    ``${APP_PATH}/history.json``.
+    Writes a commit dictionnary to the history file in ``${HISTORY_PATH}``.
 
     Args:
         commit_dict (dict): The commit details to write to the history file.

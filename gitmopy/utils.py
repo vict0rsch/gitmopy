@@ -25,6 +25,16 @@ APP_PATH = resolve_path(typer.get_app_dir("gitmopy", force_posix=True))
 Path to the application directory.
 """
 
+CONFIG_PATH = APP_PATH / "config.yaml"
+"""
+Path to the configuration file.
+"""
+
+HISTORY_PATH = APP_PATH / "history.json"
+"""
+Path to the history file.
+"""
+
 DEFAULT_CHOICES = [
     {
         "value": "skip_scope",
@@ -43,8 +53,7 @@ DEFAULT_CHOICES = [
     },
     {
         "value": "enable_history",
-        "name": "Remember commit history for auto-complete and emoji sorting"
-        + f" (saved in {str(APP_PATH)}/history.json)",
+        "name": "Remember commit history for auto-complete and emoji sorting",
         "default": True,
     },
 ]
