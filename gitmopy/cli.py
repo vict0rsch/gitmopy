@@ -81,6 +81,18 @@ class CatchRemoteException:
         return True
 
 
+def should_continue() -> bool:
+    """
+    Prompt the user to continue or stop the current commit loop.
+
+    Returns:
+        bool: Whether the user wants to continue or not.
+    """
+    print("Press [orange]q[/orange] to quit, [green]enter[/green] to commit again")
+    should_stop = typer.prompt("q / enter", default="enter")
+    return should_stop != "q"
+
+
 def get_staged(repo: Repo) -> List[str]:
     """
     Get staged files from a GitPython repository.
@@ -171,7 +183,7 @@ def commit(
             + " selection when several exist. Use several '--remote {remote name}' "
             + "to push to multiple remotes"
         ),
-    ] = None,
+    ] = [],
     keep_alive: Annotated[
         Optional[bool],
         typer.Option(
@@ -216,6 +228,19 @@ def commit(
         if repo_ok:
             # get current files' status
             status = get_files_status(repo)
+            if not dry and not sum([len(v) for v in status.values()]):
+                # no files to commit
+                if not keep_alive:
+                    # user does not wand to commit continuously
+                    print("[yellow]Nothing to commit.[/yellow]")
+                    raise typer.Exit(0)
+
+                # wait for user input
+                if should_continue():
+                    # user wants to commit again: start over
+                    continue
+                # user wants to stop: break loop
+                break
 
         if not dry:
             # no staged files and user does not want to add: abort
@@ -226,7 +251,7 @@ def commit(
                     + " to add all unstaged files.[/yellow]\n"
                 )
                 raise typer.Exit(1)
-            if remote is not None and not push:
+            if remote and not push:
                 print(
                     "\n[yellow]Ignoring --remote flag because --push is not set[/yellow]\n"
                 )
@@ -271,42 +296,56 @@ def commit(
         repo.index.commit(commit_message)
 
         if push:
+            # push to remotes. If several remotes, use either the values from --remote
+            # or prompt the user to choose them.
+            # If no remote, ignore push.
             if len(repo.remotes) == 0:
                 print("[yellow]No remote found. Ignoring push.[/yellow]")
             else:
                 selected_remotes = set([repo.remotes[0].name])
                 if len(repo.remotes) > 1:
-                    # PROMPT: choose remote
                     if remote:
+                        # use --remote values
                         selected_remotes = set(remote)
                     else:
+                        # PROMPT: choose remote
                         selected_remotes = choose_remote_prompt(repo.remotes)
                     if not selected_remotes:
+                        # stop if no remote selected
                         print("[yellow]No remote selected. Aborting.[/yellow]")
                         raise typer.Exit(1)
                     selected_remotes = set(selected_remotes)
                 print()
                 color = "dodger_blue3"
+
+                # there is at least one remote to push to at this point
                 for remote in repo.remotes:
                     if remote.name in selected_remotes:
                         print(
                             f"[{color}]Pushing to remote {remote.name}[/{color}]",
                         )
+                        # push to remote, catch exception if it fails to be able to
+                        # 1. continue pushing to other remotes
+                        # 2. potentially set the upstream branch
                         with CatchRemoteException(remote.name) as cre:
                             repo.git.push(remote.name, repo.active_branch.name)
-                            remote.push()
                         if cre.set_upsteam:
                             set_upstream = set_upstream_prompt(remote.name)
                             if set_upstream:
+                                # user wants to set the upstream branch: try again
                                 with CatchRemoteException(remote.name) as cre:
                                     repo.git.push(
                                         "--set-upstream",
                                         remote.name,
                                         repo.active_branch.name,
                                     )
-        print("\nDone 🥳\n")
-        if not keep_alive:
+
+        if not keep_alive or not should_continue():
+            # user did not set the --keep-alive flag or does not want to continue:
+            # we're done.
             break
+
+    print("\nDone 🥳\n")
 
 
 @app.command(
