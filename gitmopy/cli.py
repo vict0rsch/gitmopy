@@ -175,7 +175,7 @@ def commit(
 
     if config["enable_history"]:
         # save commit details to history
-        save_to_history(cd)
+        save_to_history(commit_dict)
 
     # commit
     repo.index.commit(commit_message)
