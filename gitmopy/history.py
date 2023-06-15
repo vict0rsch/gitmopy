@@ -124,8 +124,7 @@ def sort_emojis(
     dater = {}
     for commit in history:
         dater[commit["emoji"]] = commit["timestamp"]
-    gitmojis = sorted(gitmojis, key=lambda x: dater.get(x["emoji"], 0), reverse=True)
-    return gitmojis
+    gitmojis.sort(key=lambda x: dater.get(x["emoji"], 0), reverse=True)
 
 
 def gitmojis_setup() -> None:
@@ -149,4 +148,4 @@ def gitmojis_setup() -> None:
         return
 
     load_history()
-    GITMOJIS = sort_emojis(GITMOJIS)
+    sort_emojis(GITMOJIS)
