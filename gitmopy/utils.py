@@ -1,3 +1,6 @@
+"""
+Utility functions and constants for ``gitmopy``.
+"""
 from os.path import expandvars
 from pathlib import Path
 from typing import Dict, List, Union
@@ -70,6 +73,7 @@ Default gitmopy configuration.
 def load_config() -> Dict[str, bool]:
     """
     Load the configuration from ``${APP_PATH}/config.yaml``.
+
     Returns the default configuration if the file does not exist.
 
     Returns:
@@ -84,6 +88,7 @@ def load_config() -> Dict[str, bool]:
 def save_config(config: Dict[str, bool]) -> None:
     """
     Save the configuration to ``${APP_PATH}/config.yaml``.
+
     Creates the parent directory if it does not exist.
 
     Args:
@@ -112,7 +117,7 @@ def print_staged_files(staged: List[str]) -> None:
 
 
 def message_from_commit_dict(commit_dict: Dict[str, str]) -> str:
-    """
+    r"""
     Create a commit message from a commit dictionary.
 
     Depending on whether ``scope`` is set, will look like

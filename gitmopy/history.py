@@ -1,3 +1,10 @@
+"""
+User history management.
+
+In particular:
+* sort emojis by timestamp
+* prepare history for prompt completion (title, scope, message)
+"""
 import json
 from datetime import datetime
 from typing import Dict, List, Optional
@@ -124,7 +131,11 @@ def sort_emojis(
 def gitmojis_setup() -> None:
     """
     Setup the emoji list.
-    Adds a "name" and "value" key to each emoji.
+
+    * loads the config
+    * adds ``name`` and ``value`` keys to each emoji (for prompt Choices)
+    * loads the history (if enabled)
+    * sorts the emojis by most recent usage in history (if enabled)
     """
     global GITMOJIS
 

@@ -1,3 +1,6 @@
+"""
+Command line interface for gitmopy.
+"""
 from typing import Dict, List, Optional
 
 import git
@@ -30,14 +33,43 @@ gitmojis_setup()
 
 class CatchRemoteException:
     def __init__(self, remote: str):
+        """
+        Context manager to catch GitCommandError when pushing to a remote.
+
+        Also stores whether the issue is that the remote has no upstream branch.
+
+        Args:
+            remote (str): Name of the remote repository that is being pushed to.
+        """
         self.remote = remote
         self.error = False
         self.set_upsteam = False
 
     def __enter__(self):
+        """
+        Enter the context manager.
+
+        Returns:
+            CatchRemoteException: the context manager itself.
+        """
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        """
+        Exit the context manager and catch a potential GitCommandError exception.
+
+        Prints the error in red.
+        If the error is that the remote has no upstream branch, store a ``bool``
+        attribute to tell the CLI it should ask the user if they want to set it up.
+
+        Args:
+            exc_type (BaseException): Exception type
+            exc_value (BaseException): Exception value
+            traceback (TracebackType): _description_
+
+        Returns:
+            bool: True. This allows to always catch the exception.
+        """
         if exc_type is git.exc.GitCommandError:
             self.error = True
             self.set_upsteam = "has no upstream branch" in exc_value.stderr
@@ -91,6 +123,7 @@ def get_untracked(repo: Repo) -> List[str]:
 def get_files_status(repo: Repo) -> Dict[str, List[str]]:
     """
     Make a dictionnary of the files' status in a GitPython repository.
+
     Keys are "staged", "unstaged" and "untracked".
     Values are lists of file paths.
 
