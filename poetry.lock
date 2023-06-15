@@ -79,17 +79,6 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
-name = "emoji"
-version = "2.5.0"
-description = "Emoji for Python"
-category = "main"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-
-[package.extras]
-dev = ["coverage", "coveralls", "pytest"]
-
-[[package]]
 name = "executing"
 version = "1.2.0"
 description = "Get the currently executing AST node of a frame, and other information"
@@ -485,7 +474,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "9e4a027cef0abbba18b8f6df3f5a3414a7605cf9d0dd792187848d12a15824b1"
+content-hash = "ac60a7b5fb05b303f1678f3fbfa2e308e700e09b2da83002e221a60a525ecfe7"
 
 [metadata.files]
 appnope = [
@@ -538,9 +527,6 @@ colorama = [
 decorator = [
     {file = "decorator-5.1.1-py3-none-any.whl", hash = "sha256:b8c3f85900b9dc423225913c5aace94729fe1fa9763b38939a95226f02d37186"},
     {file = "decorator-5.1.1.tar.gz", hash = "sha256:637996211036b6385ef91435e4fae22989472f9d571faba8927ba8253acbc330"},
-]
-emoji = [
-    {file = "emoji-2.5.0.tar.gz", hash = "sha256:0e048dd540a0644bd30790b540466492f1487a3788528422fe196a939a7a3ac0"},
 ]
 executing = [
     {file = "executing-1.2.0-py2.py3-none-any.whl", hash = "sha256:0314a69e37426e3608aada02473b4161d4caf5a4b244d1d0c48072b8fee7bacc"},
