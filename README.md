@@ -17,6 +17,8 @@ alias gpya="gitmopy commit --add"
 alias gpyk="gitmopy commit --add --keep-alive"
 ```
 
+![gpyk depo](assets/gpyk.png)
+
 ## User guide
 
 ```text

@@ -286,7 +286,7 @@ def commit(
                     print("[yellow]Nothing to commit.[/yellow]")
                     raise typer.Exit(0)
 
-                # wait for user input
+eza                # wait for user input
                 print("[yellow]Nothing to commit.[/yellow]")
                 if should_commit_again():
                     # user wants to commit again: start over
