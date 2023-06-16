@@ -133,8 +133,8 @@ def should_commit_again() -> bool:
     """
 
     print(
-        "\n🔄 [u]Ready to commit again[u]. Press [b green]enter[/b green] to "
-        + " commit again or [b red]q[/b red] to quit.",
+        "\n🔄 [u]Ready to commit again[/u]. Press [b green]enter[/b green] to "
+        + "commit again or [b red]q[/b red] to quit.",
         end="",
     )
     should_stop = typer.prompt(
