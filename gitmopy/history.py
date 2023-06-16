@@ -24,43 +24,7 @@ def load_history() -> List[Dict[str, str]]:
     """
     global HISTORY
     history = []
-    _history = [
-        {
-            "timestamp": 2686784403,
-            "emoji": "🧵",
-            "scope": "all",
-            "title": "Heallo",
-            "message": "meessaage",
-        },
-        {
-            "timestamp": 1686784120,
-            "emoji": "🧵",
-            "scope": "all ea raz",
-            "title": "Heallo",
-            "message": "meessaage",
-        },
-        {
-            "timestamp": 1686783103,
-            "emoji": "💸",
-            "scope": "all ea ezar",
-            "title": "Heallo",
-            "message": "meessaage",
-        },
-        {
-            "timestamp": 1686784403,
-            "emoji": "💸",
-            "scope": "erzar",
-            "title": "Heallo",
-            "message": "meessaage",
-        },
-        {
-            "timestamp": 1686784403,
-            "emoji": "🧵",
-            "scope": "feza",
-            "title": "Heallo",
-            "message": "meessaage",
-        },
-    ]
+
     if HISTORY_PATH.exists():
         history = json.loads(HISTORY_PATH.read_text())
 

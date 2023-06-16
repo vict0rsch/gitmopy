@@ -98,6 +98,7 @@ def should_commit_again() -> bool:
     Returns:
         bool: Whether the user wants to continue or not.
     """
+    gitmojis_setup()
     print(
         "\n🔄 [u]Ready to commit again[/u]. Press [b green]enter[/b green] to "
         + "commit again or [b red]q[/b red] to quit.",
