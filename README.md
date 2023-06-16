@@ -98,3 +98,13 @@ $ gitmopy commit --help
   * 👋 **Help wanted**
 * Docs
   * Not critical
+
+# Resources
+
+`gitmopy` is inspired by
+
+It is built thanks to:
+
+* [`typer`](https://github.com/tiangolo/typer)
+* [`InquirePy`](https://github.com/kazhala/InquirerPy)
+* [`GitPython](https://github.com/gitpython-developers/GitPython)
