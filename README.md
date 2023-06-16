@@ -2,11 +2,22 @@
 
 An interactive Python implementation of the Gitmoji standard: https://gitmoji.dev/
 
-```
+```text
 pip install gitmopy
 ```
 
 ![demo-gitmopy](./assets/demo-gitmopy.gif)
+
+## How to use
+
+* I typically use `$ gitmopy commit --add --keep-alive`
+* Navigate through options with ⬆️ and ⬇️
+* Select option with **`space`**
+* Validate selection with **`enter`**
+* Press **`tab`** to auto-complete
+  * Press `tab` on an empty line to see history
+* Restart commit with **`crtl+c`**
+  * The keyboard interruption will be caught once, then press `enter` to restart
 
 ## Suggested shortcuts
 
@@ -141,6 +152,10 @@ $ gitmopy commit --help
 
 ## To Do
 
+* Features
+  * *If requested:*
+    * Install hook
+    * `git commit` flags (like `-S`)
 * Tests
   * https://typer.tiangolo.com/tutorial/testing/
   * 👋 **Help wanted**
@@ -149,7 +164,7 @@ $ gitmopy commit --help
 
 ## Resources
 
-`gitmopy` is inspired by
+`gitmopy` is inspired by [`gitmoji-cli](https://github.com/carloscuesta/gitmoji-cli).
 
 It is built thanks to:
 
