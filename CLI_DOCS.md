@@ -35,6 +35,7 @@ $ gitmopy commit [OPTIONS]
 * `--push / --no-push`: Whether to `git push` after commit. If multiple remotes exist, you will be asked to interactively choose the ones to push to. Use --remote to skip interactive selection. Disabled by default.
 * `--dry / --no-dry`: Whether or not to actually commit.  [default: no-dry]
 * `--remote TEXT`: Remote to push to after commit. Use to skip interactive remote selection when several exist. Use several '--remote {remote name}' to push to multiple remotes
+* `--keep-alive / --no-keep-alive`: Whether or not to keep the app alive after commit, to be ready for another one.   [default: no-keep-alive]
 * `--help`: Show this message and exit.
 
 ## `gitmopy config`
