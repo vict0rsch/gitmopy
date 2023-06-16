@@ -112,6 +112,51 @@ def should_commit_again() -> bool:
     return commit_again
 
 
+def push_cli(repo, remote):
+    # push to remotes. If several remotes, use either the values from --remote
+    # or prompt the user to choose them.
+    # If no remote, ignore push.
+    if len(repo.remotes) == 0:
+        print("[yellow]No remote found. Ignoring push.[/yellow]")
+    else:
+        selected_remotes = set([repo.remotes[0].name])
+        if len(repo.remotes) > 1:
+            if remote:
+                # use --remote values
+                selected_remotes = set(remote)
+            else:
+                # PROMPT: choose remote
+                selected_remotes = choose_remote_prompt(repo.remotes)
+            if not selected_remotes:
+                # stop if no remote selected
+                print("[yellow]No remote selected. Aborting.[/yellow]")
+                raise typer.Exit(1)
+            selected_remotes = set(selected_remotes)
+        print()
+        color = "dodger_blue3"
+
+        # there is at least one remote to push to at this point
+        for remote in repo.remotes:
+            if remote.name in selected_remotes:
+                print(
+                    f"[{color}]Pushing to remote {remote.name}[/{color}]",
+                )
+                # push to remote, catch exception if it fails to be able to
+                # 1. continue pushing to other remotes
+                # 2. potentially set the upstream branch
+                with CatchRemoteException(remote.name) as cre:
+                    repo.git.push(remote.name, repo.active_branch.name)
+                if cre.set_upsteam:
+                    set_upstream = set_upstream_prompt(remote.name)
+                    if set_upstream:
+                        # user wants to set the upstream branch: try again
+                        with CatchRemoteException(remote.name) as cre:
+                            repo.git.push(
+                                "--set-upstream",
+                                remote.name,
+                                repo.active_branch.name,
+                            )
+
 @app.command(
     help="Commit staged files. Use --add to interactively select files to"
     + " stage if none is already staged",
