@@ -170,7 +170,6 @@ def safe_capitalize(s):
     Capitalize a string if it is not empty, but keeps all-caps words.
 
     Example:
-
     ..code-block:: python
 
         >>> safe_capitalize("hello")
