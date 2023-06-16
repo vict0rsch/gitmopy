@@ -1,11 +1,10 @@
 """
 Command line interface for gitmopy.
 """
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 import git
 import typer
-from git import Repo
 from rich import print
 from typing_extensions import Annotated
 
