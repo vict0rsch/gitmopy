@@ -156,6 +156,7 @@ $ gitmopy commit --help
   * *If requested:*
     * Install hook
     * `git commit` flags (like `-S`)
+    * max history length (if loading the json becomes slow)
 * Tests
   * https://typer.tiangolo.com/tutorial/testing/
   * 👋 **Help wanted**
