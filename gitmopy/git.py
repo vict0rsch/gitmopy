@@ -138,7 +138,7 @@ def commits_behind(repo: Repo) -> int:
     Returns:
         int: Number of commits the local current branch is behind for each remote.
     """
-    b = repo.current_branch
+    b = repo.active_branch.name
     return {
         r.name: len(list(repo.iter_commits(f"{b}..{r.name}/{b}"))) for r in repo.remotes
     }
@@ -154,7 +154,7 @@ def commits_ahead(repo: Repo) -> int:
     Returns:
         int: Number of commits the local current branch is behind for each remote.
     """
-    b = repo.current_branch
+    b = repo.active_branch.name
     return {
         r.name: len(list(repo.iter_commits(f"{r.name}/{b}..{b}"))) for r in repo.remotes
     }
