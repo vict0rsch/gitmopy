@@ -30,6 +30,10 @@ from gitmopy.utils import (
 app = typer.Typer()
 gitmojis_setup()
 
+_stop = object()
+_restart = object()
+_cancelled = object()
+
 
 class CatchRemoteException:
     def __init__(self, remote: str):
@@ -95,28 +99,29 @@ def unstage(repo: Repo, files: List[str]) -> None:
 
 def catch_keyboard_interrupt(func, *args, **kwargs):
     def _func(*_args, **_kwargs):
-        return_value = None
+        return_value = _cancelled
         try:
             return_value = func(*_args, **_kwargs)
         finally:
             return return_value
 
-    while True:
-        return_value = _func(*args, **kwargs)
-        if return_value is not None:
-            return return_value
-        print(
-            "\n[yellow]Press [b green]enter[/b green] to restart"
-            + " or [b red]ctrl+c[/b red] again to quit (or [b red]q[/b red]).",
-            end="",
-        )
-        should_stop = typer.prompt(
-            "", prompt_suffix="", default="enter", show_default=False
-        )
-        if should_stop == "q":
-            break
-        else:
-            print()
+    return_value = _func(*args, **kwargs)
+    if return_value is not _cancelled:
+        return return_value
+
+    print(
+        "\n[yellow]Press [b green]enter[/b green] to restart commit process"
+        + " or [b red]ctrl+c[/b red] again to quit (or [b red]q[/b red]).",
+        end="",
+    )
+    should_stop = typer.prompt(
+        "", prompt_suffix="", default="enter", show_default=False
+    )
+
+    if should_stop == "q":
+        return _stop
+    print()
+    return _restart
 
 
 def should_commit_again() -> bool:
@@ -302,8 +307,10 @@ def commit(
             if not status["staged"] and add:
                 # PROMPT: list files to user and add their selection
                 to_add = catch_keyboard_interrupt(git_add_prompt, status)
-                if to_add is None:
+                if to_add is _stop:
                     break
+                elif to_add is _restart:
+                    continue
             else:
                 # there are staged files: list them to user
                 if add:
@@ -311,18 +318,21 @@ def commit(
                         "[yellow]Ignoring --add flag because the stage is"
                         + " not empty[/yellow]\n"
                     )
-                print_staged_files(status["staged"])
 
         # load gitmopy's configuraltion from yaml file
         config = load_config()
 
+        # not dry run print files about to be committed
+        if not dry:
+            print_staged_files(to_add or status["staged"])
+
         # PROMPT: get user's commit details
         print("\n[u green3]Commit details:[/u green3]")
         commit_dict = catch_keyboard_interrupt(commit_prompt, config)
-        if not commit_dict:
-            if to_add:
-                unstage(repo, to_add)
+        if commit_dict is _stop:
             break
+        elif commit_dict is _restart:
+            continue
 
         # make commit messsage
         commit_message = message_from_commit_dict(commit_dict)
@@ -336,8 +346,6 @@ def commit(
         else:
             for f in to_add:
                 repo.git.add(f)
-            if to_add:
-                print_staged_files(to_add)
 
         if config["enable_history"]:
             # save commit details to history
