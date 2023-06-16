@@ -19,6 +19,54 @@ alias gpyk="gitmopy commit --add --keep-alive"
 
 ![gpyk depo](assets/gpyk.png)
 
+## Examples
+
+```bash
+# Typical daily use-case
+# ----------------------
+
+# continuously commit, interactively select files to stage
+$ gitmopy commit --add --keep-alive
+
+# same using an alias, + push after every commit (could be dangerous)
+$ gpyk --push
+
+
+# Specific usage
+# --------------
+
+# commit currently staged files. Will fail if no file is staged.
+$ gitmopy commit
+
+# Enable interactive file selection if no file is currently staged. Ignored if
+# there are staged files.
+$ gitmopy commit --add
+
+# Commit continuously: don't leave the CLI after the first commit but restart
+# the commit procedure.
+$ gitmopy commit --keep-alive
+
+# Push to remote repositories after commit.
+# Interactively select remotes to push to if there are more than 1.
+$ gitmopy commit --push
+
+# Push to specific remotes
+$ gitmopy commit --push --remote origin --remote upstream
+
+# Make and display a commit message without staging/committing/pushing
+$ gitmopy commit --dry
+
+# configure gitmopy
+$ gitmopy config
+
+# print version, data paths and current configuration
+$ gitmopy info
+
+# print helps
+$ gitmopy --help
+$ gitmopy commit --help
+```
+
 ## User guide
 
 ```text
