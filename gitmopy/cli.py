@@ -81,39 +81,55 @@ class CatchRemoteException:
         return True
 
 
+def unstage(repo: Repo, files: List[str]) -> None:
+    """
+    Unstage files from the index.
 
-def patched_commit_prompt(repo: Repo, config: Dict[str, bool]) -> Dict[str, str]:
-    def _catched_prompt():
-        commit = None
+    Args:
+        repo (Repo): GitPython repository object.
+        files (List[str]): List of files to unstage.
+    """
+    for f in files:
+        repo.git.restore("--staged", f)
+
+
+def catch_keyboard_interrupt(func, *args, **kwargs):
+    def _func(*_args, **_kwargs):
+        return_value = None
         try:
-            commit = commit_prompt(config)
-            print("commit_prompt: ", commit)
+            return_value = func(*_args, **_kwargs)
         finally:
-            return commit
+            return return_value
 
     while True:
-        commit = _catched_prompt()
-        if commit:
-            return commit
-        print("\n[yellow]Quit (q) or commit again (enter)?[/yellow]")
-        should_stop = typer.prompt("q / enter", default="enter")
+        return_value = _func(*args, **kwargs)
+        if return_value is not None:
+            return return_value
+        print(
+            "\n[yellow]Press [b green]enter[/b green] to restart"
+            + " or [b red]ctrl+c[/b red] again to quit (or [b red]q[/b red]).",
+            end="",
+        )
+        should_stop = typer.prompt(
+            "", prompt_suffix="", default="enter", show_default=False
+        )
         if should_stop == "q":
-            # cancel_commit(repo)
             break
         else:
             print()
 
 
-def should_continue() -> bool:
+def should_commit_again() -> bool:
     """
     Prompt the user to continue or stop the current commit loop.
 
     Returns:
         bool: Whether the user wants to continue or not.
     """
+
     print(
-        "\nReady to commit again. Press [orange3]q[/orange3] to quit, "
-        + "[green]enter[/green] to commit again"
+        "\nReady to commit again. Press [b green]enter[/b green] to "
+        + " commit again or [b red]q[/b red] to quit."
     )
     should_stop = typer.prompt("q / enter", default="enter")
     return should_stop != "q"
@@ -254,6 +270,7 @@ def commit(
         if repo_ok:
             # get current files' status
             status = get_files_status(repo)
+            to_add = []
             if not dry and not sum([len(v) for v in status.values()]):
                 # no files to commit
                 if not keep_alive:
@@ -262,7 +279,7 @@ def commit(
                     raise typer.Exit(0)
 
                 # wait for user input
-                if should_continue():
+                if should_commit_again():
                     # user wants to commit again: start over
                     continue
                 # user wants to stop: break loop
@@ -284,10 +301,9 @@ def commit(
             # no staged files fbut user wants to add: start prompt
             if not status["staged"] and add:
                 # PROMPT: list files to user and add their selection
-                to_add = git_add_prompt(status)
-                for f in to_add:
-                    repo.git.add(f)
-                print_staged_files(to_add)
+                to_add = catch_keyboard_interrupt(git_add_prompt, status)
+                if to_add is None:
+                    break
             else:
                 # there are staged files: list them to user
                 if add:
@@ -302,8 +318,10 @@ def commit(
 
         # PROMPT: get user's commit details
         print("\n[u green3]Commit details:[/u green3]")
-        commit_dict = patched_commit_prompt(repo, config)
+        commit_dict = catch_keyboard_interrupt(commit_prompt, config)
         if not commit_dict:
+            if to_add:
+                unstage(repo, to_add)
             break
 
         # make commit messsage
@@ -315,6 +333,11 @@ def commit(
             print(commit_message)
             print("```")
             raise typer.Exit(0)
+        else:
+            for f in to_add:
+                repo.git.add(f)
+            if to_add:
+                print_staged_files(to_add)
 
         if config["enable_history"]:
             # save commit details to history
@@ -368,7 +391,7 @@ def commit(
                                         repo.active_branch.name,
                                     )
 
-        if not keep_alive or not should_continue():
+        if not keep_alive or not should_commit_again():
             # user did not set the --keep-alive flag or does not want to continue:
             # we're done.
             break
