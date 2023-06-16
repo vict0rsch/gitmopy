@@ -173,7 +173,7 @@ def format_remotes_diff(repo: Repo) -> str:
     behind = commits_behind(repo)
     ahead = commits_ahead(repo)
 
-    if not behind and not ahead:
+    if not (sum(behind.values()) + sum(ahead.values())):
         return ""
 
     s = "[u green]Remotes diff:[/u green]\n"
