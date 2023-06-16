@@ -165,6 +165,31 @@ def separator(title: str = "", width: int = 30, sep: str = "-") -> Separator:
     return Separator(line)
 
 
+def safe_capitalize(s):
+    """
+    Capitalize a string if it is not empty, but keeps all-caps words.
+
+    Example:
+
+    ..code-block:: python
+
+        >>> safe_capitalize("hello")
+        "Hello"
+        >>> safe_capitalize("HELLO")
+        "HELLO"
+        >>> "HELLO".capitalize()
+        "Hello"
+
+    Args:
+        s (str): String to capitalize
+    """
+    if not s:
+        return s
+    if len(s) == 1:
+        return s.upper()
+    return s[0].upper() + s[1:]
+
+
 # https://github.com/carloscuesta/gitmoji/blob/master/packages/gitmojis/src/gitmojis.json
 GITMOJIS = [
     {

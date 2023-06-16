@@ -17,6 +17,7 @@ from gitmopy.utils import (
     DEFAULT_CHOICES,
     GITMOJIS,
     load_config,
+    safe_capitalize,
     save_config,
     separator,
 )
@@ -132,7 +133,9 @@ def commit_prompt(config: Dict[str, bool]) -> Dict[str, str]:
             invalid_message="You must provide a commit tile",
             qmark="⭐️",
             amark="✓",
-            transformer=lambda t: t.capitalize() if config["capitalize_title"] else t,
+            transformer=lambda t: safe_capitalize(t)
+            if config["capitalize_title"]
+            else t,
             completer=GMPCompleter("title"),
         )
         .execute()
@@ -140,7 +143,7 @@ def commit_prompt(config: Dict[str, bool]) -> Dict[str, str]:
     )
     # Capitalize the title if the user wants to (from config)
     if config["capitalize_title"]:
-        title = title.capitalize()
+        title = safe_capitalize(title)
 
     if not config["skip_message"]:
         # get the commit's message
