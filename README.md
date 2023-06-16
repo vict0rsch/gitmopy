@@ -91,7 +91,7 @@ $ gitmopy commit --help
 ╰─────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
-# To Do
+## To Do
 
 * Tests
   * https://typer.tiangolo.com/tutorial/testing/
