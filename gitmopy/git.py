@@ -158,3 +158,29 @@ def commits_ahead(repo: Repo) -> int:
     return {
         r.name: len(list(repo.iter_commits(f"{r.name}/{b}..{b}"))) for r in repo.remotes
     }
+
+
+def format_remotes_diff(repo: Repo) -> str:
+    """
+    Format the remotes diff.
+
+    Args:
+        repo (Repo): GitPython repository object.
+
+    Returns:
+        str: Formatted remotes diff.
+    """
+    behind = commits_behind(repo)
+    ahead = commits_ahead(repo)
+
+    if not behind and not ahead:
+        return ""
+
+    s = "Remotes diff:\n"
+    for r in repo.remotes:
+        if behind[r.name]:
+            s += f"[orange3]behind {r.name} by {behind[r.name]} commit(s)[/orange3]\n"
+        if ahead[r.name]:
+            s += f"[plum3]ahead {r.name} by {ahead[r.name]} commit(s)[/plum3]\n"
+
+    return s
