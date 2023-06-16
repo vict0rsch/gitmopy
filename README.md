@@ -8,6 +8,17 @@ pip install gitmopy
 
 ![demo-gitmopy](./assets/demo-gitmopy.gif)
 
+## Suggested shortcuts
+
+```bash
+alias gpy="gitmopy"
+alias gpyc="gitmopy commit"
+alias gpya="gitmopy commit --add"
+alias gpyk="gitmopy commit --add --keep-alive"
+```
+
+## User guide
+
 ```text
 $ gitmopy info
 
