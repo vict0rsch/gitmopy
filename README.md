@@ -99,7 +99,7 @@ $ gitmopy commit --help
 * Docs
   * Not critical
 
-# Resources
+## Resources
 
 `gitmopy` is inspired by
 
