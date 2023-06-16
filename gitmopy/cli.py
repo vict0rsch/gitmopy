@@ -103,10 +103,12 @@ def should_commit_again() -> bool:
         + "commit again or [b red]q[/b red] to quit.",
         end="",
     )
-    should_stop = typer.prompt(
-        "", default="enter", show_default=False, prompt_suffix=""
+    commit_again = (
+        typer.prompt("", default="enter", show_default=False, prompt_suffix="") != "q"
     )
-    return should_stop != "q"
+    if commit_again:
+        print()
+    return commit_again
 
 
 @app.command(
