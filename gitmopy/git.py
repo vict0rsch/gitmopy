@@ -176,7 +176,7 @@ def format_remotes_diff(repo: Repo) -> str:
     if not behind and not ahead:
         return ""
 
-    s = "Remotes diff:\n"
+    s = "[u green]Remotes diff:[/u green]\n"
     for r in repo.remotes:
         if behind[r.name]:
             s += f"[orange3]behind {r.name} by {behind[r.name]} commit(s)[/orange3]\n"
