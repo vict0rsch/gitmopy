@@ -4,11 +4,12 @@ Command line interface for gitmopy.
 from typing import List, Optional
 
 import git
+from git import Repo
 import typer
 from rich import print
 from typing_extensions import Annotated
 
-from gitmopy.git import CatchRemoteException, get_files_status
+from gitmopy.git import CatchRemoteException, get_files_status, format_remotes_diff
 from gitmopy.history import gitmojis_setup, save_to_history
 from gitmopy.prompt import (
     choose_remote_prompt,
@@ -91,24 +92,41 @@ def catch_keyboard_interrupt(func, *args, **kwargs):
     return _restart
 
 
-def should_commit_again() -> bool:
+def should_commit_again(repo: Repo, remote: List[str]) -> bool:
     """
     Prompt the user to continue or stop the current commit loop.
+
+    Args:
+        repo (Repo): The git repository.
 
     Returns:
         bool: Whether the user wants to continue or not.
     """
     gitmojis_setup()
-    print(
-        "\n🔄 [u]Ready to commit again[/u]. Press [b green]enter[/b green] to "
-        + "commit again or [b red]q[/b red] to quit.",
-        end="",
+    prompt_txt = (
+        "\n🔄 [u]Ready to commit again[/u]. Press [b green]enter[/b green] "
+        + "to commit again"
     )
-    commit_again = (
-        typer.prompt("", default="enter", show_default=False, prompt_suffix="") != "q"
+
+    remotes_diff = format_remotes_diff(repo)
+    if remotes_diff:
+        print("\n\n" + remotes_diff)
+        prompt_txt += ", [b dodger_blue2]p[/b dodger_blue2] to push and commit again,"
+
+    print(prompt_txt + " or [b red]q[/b red] to quit.", end="")
+
+    commit_again = typer.prompt(
+        "", default="enter", show_default=False, prompt_suffix=""
     )
+    if remotes_diff and commit_again == "p":
+        push_cli(repo, remote)
+        return should_commit_again(repo, remote)
+
+    commit_again = commit_again != "q"
+
     if commit_again:
         print()
+
     return commit_again
 
 
@@ -156,6 +174,7 @@ def push_cli(repo, remote):
                                 remote.name,
                                 repo.active_branch.name,
                             )
+
 
 @app.command(
     help="Commit staged files. Use --add to interactively select files to"
@@ -243,7 +262,7 @@ def commit(
 
                 # wait for user input
                 print("[yellow]Nothing to commit.[/yellow]")
-                if should_commit_again():
+                if should_commit_again(repo, remote):
                     # user wants to commit again: start over
                     continue
                 # user wants to stop: break loop
@@ -314,53 +333,8 @@ def commit(
         repo.index.commit(commit_message)
 
         if push:
-            # push to remotes. If several remotes, use either the values from --remote
-            # or prompt the user to choose them.
-            # If no remote, ignore push.
-            if len(repo.remotes) == 0:
-                print("[yellow]No remote found. Ignoring push.[/yellow]")
-            else:
-                selected_remotes = set([repo.remotes[0].name])
-                if len(repo.remotes) > 1:
-                    if remote:
-                        # use --remote values
-                        selected_remotes = set(remote)
-                    else:
-                        # PROMPT: choose remote
-                        selected_remotes = choose_remote_prompt(repo.remotes)
-                    if not selected_remotes:
-                        # stop if no remote selected
-                        print("[yellow]No remote selected. Aborting.[/yellow]")
-                        raise typer.Exit(1)
-                    selected_remotes = set(selected_remotes)
-                print()
-                color = "dodger_blue3"
-
-                # there is at least one remote to push to at this point
-                for remote in repo.remotes:
-                    if remote.name in selected_remotes:
-                        print(
-                            f"[{color}]Pushing to remote {remote.name}[/{color}]",
-                        )
-                        # push to remote, catch exception if it fails to be able to
-                        # 1. continue pushing to other remotes
-                        # 2. potentially set the upstream branch
-                        with CatchRemoteException(remote.name) as cre:
-                            repo.git.push(remote.name, repo.active_branch.name)
-                        if cre.set_upsteam:
-                            set_upstream = set_upstream_prompt(remote.name)
-                            if set_upstream:
-                                # user wants to set the upstream branch: try again
-                                with CatchRemoteException(remote.name) as cre:
-                                    repo.git.push(
-                                        "--set-upstream",
-                                        remote.name,
-                                        repo.active_branch.name,
-                                    )
-
-        if not keep_alive or not should_commit_again():
-            # user did not set the --keep-alive flag or does not want to continue:
-            # we're done.
+            push_cli(repo, remote)
+        if not keep_alive or not should_commit_again(repo, remote):
             break
 
     print("\nDone 🥳\n")
