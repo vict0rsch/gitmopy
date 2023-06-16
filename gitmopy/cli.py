@@ -8,6 +8,7 @@ import typer
 from rich import print
 from typing_extensions import Annotated
 
+from gitmopy.git import CatchRemoteException, get_files_status
 from gitmopy.history import gitmojis_setup, save_to_history
 from gitmopy.prompt import (
     choose_remote_prompt,
@@ -18,14 +19,13 @@ from gitmopy.prompt import (
 )
 from gitmopy.utils import (
     APP_PATH,
-    HISTORY_PATH,
     CONFIG_PATH,
+    HISTORY_PATH,
     load_config,
     message_from_commit_dict,
     print_staged_files,
     resolve_path,
 )
-from gitmopy.git import get_files_status, CatchRemoteException
 
 app = typer.Typer()
 gitmojis_setup()

@@ -2,6 +2,7 @@
 `gitmopy`'s Git-related utility functions.
 """
 from typing import Dict, List
+
 from git import Repo
 from git.exc import GitCommandError
 

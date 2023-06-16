@@ -6,9 +6,9 @@ from pathlib import Path
 from typing import Dict, List, Union
 
 import typer
+from InquirerPy.separator import Separator
 from rich import print
 from yaml import safe_dump, safe_load
-from InquirerPy.separator import Separator
 
 
 def resolve_path(path: Union[str, Path]) -> Path:
