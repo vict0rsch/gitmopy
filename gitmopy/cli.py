@@ -98,7 +98,30 @@ def unstage(repo: Repo, files: List[str]) -> None:
 
 
 def catch_keyboard_interrupt(func, *args, **kwargs):
+    """
+    Function to wrap another function in a try/finally block and catch Aborts.
+
+    Executes its first argument with the following arguments and keyword arguments.
+    When the function is done (or has been aborted by ctrl+c), it will prompt the
+    user to restart the commit process or quit.
+
+    Required because I couldn't find a way to catch typer.Abort exceptions in a
+    standard try/except block.
+
+    Args:
+        func (Callable): the function to wrap.
+        *args (Any): positional arguments to pass to ``func``.
+        **kwargs (Any): keyword arguments to pass to ``func``.
+    """
+
     def _func(*_args, **_kwargs):
+        """
+        Function wrapper that catches typer.Abort exceptions.
+
+        Returns:
+            Any: The wrapped function's return value or the ``_cancelled``
+                sentinel if the function was aborted.
+        """
         return_value = _cancelled
         try:
             return_value = func(*_args, **_kwargs)
@@ -107,6 +130,7 @@ def catch_keyboard_interrupt(func, *args, **kwargs):
 
     return_value = _func(*args, **kwargs)
     if return_value is not _cancelled:
+        # function was not aborted
         return return_value
 
     print(
@@ -118,8 +142,13 @@ def catch_keyboard_interrupt(func, *args, **kwargs):
         "", prompt_suffix="", default="enter", show_default=False
     )
 
+    # at this point if the user presses ctrl+c again, the program will exit
+
+    # user asked to quit
     if should_stop == "q":
         return _stop
+
+    # user wants to restart the commit process
     print()
     return _restart
 
@@ -131,7 +160,6 @@ def should_commit_again() -> bool:
     Returns:
         bool: Whether the user wants to continue or not.
     """
-
     print(
         "\n🔄 [u]Ready to commit again[/u]. Press [b green]enter[/b green] to "
         + "commit again or [b red]q[/b red] to quit.",
@@ -286,7 +314,7 @@ def commit(
                     print("[yellow]Nothing to commit.[/yellow]")
                     raise typer.Exit(0)
 
-eza                # wait for user input
+                # wait for user input
                 print("[yellow]Nothing to commit.[/yellow]")
                 if should_commit_again():
                     # user wants to commit again: start over
