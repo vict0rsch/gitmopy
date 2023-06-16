@@ -1,3 +1,6 @@
+"""
+Utility functions and constants for ``gitmopy``.
+"""
 from os.path import expandvars
 from pathlib import Path
 from typing import Dict, List, Union
@@ -5,6 +8,7 @@ from typing import Dict, List, Union
 import typer
 from rich import print
 from yaml import safe_dump, safe_load
+from InquirerPy.separator import Separator
 
 
 def resolve_path(path: Union[str, Path]) -> Path:
@@ -70,6 +74,7 @@ Default gitmopy configuration.
 def load_config() -> Dict[str, bool]:
     """
     Load the configuration from ``${APP_PATH}/config.yaml``.
+
     Returns the default configuration if the file does not exist.
 
     Returns:
@@ -84,6 +89,7 @@ def load_config() -> Dict[str, bool]:
 def save_config(config: Dict[str, bool]) -> None:
     """
     Save the configuration to ``${APP_PATH}/config.yaml``.
+
     Creates the parent directory if it does not exist.
 
     Args:
@@ -112,7 +118,7 @@ def print_staged_files(staged: List[str]) -> None:
 
 
 def message_from_commit_dict(commit_dict: Dict[str, str]) -> str:
-    """
+    r"""
     Create a commit message from a commit dictionary.
 
     Depending on whether ``scope`` is set, will look like
@@ -134,6 +140,29 @@ def message_from_commit_dict(commit_dict: Dict[str, str]) -> str:
         message += f"({commit_dict['scope']}): "
     message += f"{commit_dict['title']}\n\n{commit_dict['message']}"
     return message.strip()
+
+
+def separator(title: str = "", width: int = 30, sep: str = "-") -> Separator:
+    """
+    Create an InquirerPy separator with a title.
+
+    Args:
+        title (str, optional): Title in-between separator characters.
+            Defaults to ``""``.
+        width (int, optional): Total length of sperator line. Defaults to 30.
+        sep (str, optional): Character to use around the ``title``. Defaults to ``"-"``.
+
+    Returns:
+        Separator: _description_
+    """
+    assert sep
+    assert width > 0
+    if len(title) > width - 4:
+        width = len(title) + 4
+
+    first = (width - len(title)) // 2
+    line = f"{sep * first} {title} {sep * (width - first - len(title) - 2)}"
+    return Separator(line)
 
 
 # https://github.com/carloscuesta/gitmoji/blob/master/packages/gitmojis/src/gitmojis.json

@@ -8,6 +8,19 @@ pip install gitmopy
 
 ![demo-gitmopy](./assets/demo-gitmopy.gif)
 
+## Suggested shortcuts
+
+```bash
+alias gpy="gitmopy"
+alias gpyc="gitmopy commit"
+alias gpya="gitmopy commit --add"
+alias gpyk="gitmopy commit --add --keep-alive"
+```
+
+![gpyk depo](assets/gpyk.png)
+
+## User guide
+
 ```text
 $ gitmopy info
 
@@ -77,3 +90,11 @@ $ gitmopy commit --help
 │ --help                       Show this message and exit.                            │
 ╰─────────────────────────────────────────────────────────────────────────────────────╯
 ```
+
+# To Do
+
+* Tests
+  * https://typer.tiangolo.com/tutorial/testing/
+  * 👋 **Help wanted**
+* Docs
+  * Not critical

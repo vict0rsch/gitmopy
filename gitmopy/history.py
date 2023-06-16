@@ -1,3 +1,10 @@
+"""
+User history management.
+
+In particular:
+* sort emojis by timestamp
+* prepare history for prompt completion (title, scope, message)
+"""
 import json
 from datetime import datetime
 from typing import Dict, List, Optional
@@ -117,24 +124,28 @@ def sort_emojis(
     dater = {}
     for commit in history:
         dater[commit["emoji"]] = commit["timestamp"]
-    gitmojis = sorted(gitmojis, key=lambda x: dater.get(x["emoji"], 0), reverse=True)
-    return gitmojis
+    gitmojis.sort(key=lambda x: dater.get(x["emoji"], 0), reverse=True)
 
 
 def gitmojis_setup() -> None:
     """
     Setup the emoji list.
-    Adds a "name" and "value" key to each emoji.
+
+    * loads the config
+    * adds ``name`` and ``value`` keys to each emoji (for prompt Choices)
+    * loads the history (if enabled)
+    * sorts the emojis by most recent usage in history (if enabled)
     """
     global GITMOJIS
 
     config = load_config()
 
+    for k, e in enumerate(GITMOJIS):
+        GITMOJIS[k]["name"] = e["emoji"] + " " + e["description"]
+        GITMOJIS[k]["value"] = e["emoji"]
+
     if not config["enable_history"]:
         return
 
-    for e in GITMOJIS:
-        e["name"] = e["emoji"] + " " + e["description"]
-        e["value"] = e["emoji"]
     load_history()
-    GITMOJIS = sort_emojis(GITMOJIS)
+    sort_emojis(GITMOJIS)

@@ -1,23 +1,38 @@
+"""
+Module handling user prompts.
+
+Prompts typically parameterize the commit message or ``gitmopy``'s behavior.
+"""
+
 from typing import Any, Dict, List, Optional
 
 from InquirerPy import inquirer
-from InquirerPy.base.control import Choice, Separator
+from InquirerPy.base.control import Choice
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.document import Document
 
 from gitmopy import history as gmp_history
-from gitmopy.utils import APP_PATH, DEFAULT_CHOICES, GITMOJIS, load_config, save_config
+from gitmopy.utils import (
+    APP_PATH,
+    DEFAULT_CHOICES,
+    GITMOJIS,
+    load_config,
+    save_config,
+    separator,
+)
 
 
 class GMPCompleter(Completer):
     def __init__(self, key: str, max_results: Optional[int] = 10):
         """
         A completer that completes a text prompt from the user's history.
+
         Completions are sorted by most recent first.
         Returns up to ``self.max_results`` results.
 
         Args:
             key (str): Key to complete from. Must be one of "scope", "title", "message".
+            max_results (int): Maximum number of results to return. Defaults to 10.
         """
         self.key = key
         self.max_results = max_results
@@ -61,11 +76,7 @@ class GMPCompleter(Completer):
 
 def commit_prompt(config: Dict[str, bool]) -> Dict[str, str]:
     """
-    Prompt the user for a commit message in up to 4 steps:
-    - Select gitmoji
-    - Select scope
-    - Enter title
-    - Enter message
+    Prompt the user for emoji, scope title and message to make a commit message.
 
     Scope and message are optional.
     Scope and message can be bypassed from the config (run ``gitmopy config``)
@@ -79,7 +90,6 @@ def commit_prompt(config: Dict[str, bool]) -> Dict[str, str]:
         dict: User-specified commit as a dict with keys
             ``"emoji"``, ``"scope"``, ``"title"``, ``"message"``.
     """
-
     # get the commit's gitmoji
     emoji = (
         inquirer.fuzzy(
@@ -158,6 +168,7 @@ def commit_prompt(config: Dict[str, bool]) -> Dict[str, str]:
 def config_prompt() -> None:
     """
     Prompt the user for configuration options.
+
     Will setup:
     - Whether to skip scope
     - Whether to skip message
@@ -207,12 +218,15 @@ def git_add_prompt(status: Dict[str, List[str]]) -> List[str]:
         list: List of all the files selected by the user.
     """
     choices = []
+    if len(status["unstaged"]) > 0:
+        choices.append(separator("Unstaged files"))
     for s in status["unstaged"]:
-        choices.append(Choice(s, f"{s} -- unstaged", True))
-    if len(choices) > 0:
-        choices.append(Separator())
+        choices.append(Choice(s, s, True))
+
+    if len(status["untracked"]) > 0:
+        choices.append(separator("Untracked files"))
     for s in status["untracked"]:
-        choices.append(Choice(s, f"{s} -- untracked", True))
+        choices.append(Choice(s, s, True))
 
     selected = inquirer.checkbox(
         message="Select files to add for the commit.",
@@ -228,6 +242,15 @@ def git_add_prompt(status: Dict[str, List[str]]) -> List[str]:
 
 
 def choose_remote_prompt(remotes: List[str]) -> List[str]:
+    """
+    Prompt the user to select remotes to push to.
+
+    Args:
+        remotes (List[str]): Available remotes.
+
+    Returns:
+        List[str]: Selected remotes.
+    """
     choices = [Choice(r.name, r.name, True) for r in remotes]
     selected = inquirer.checkbox(
         "Select remotes to push to:",
@@ -240,3 +263,21 @@ def choose_remote_prompt(remotes: List[str]) -> List[str]:
     ).execute()
 
     return selected
+
+
+def set_upstream_prompt(remote_name: str) -> bool:
+    """
+    Prompt the user to set the upstream branch for a remote.
+
+    Args:
+        remote_name (str): Remote name.
+
+    Returns:
+        bool: Whether or not to set the upstream branch.
+    """
+    return inquirer.confirm(
+        f"Do you want to set the upstream branch for '{remote_name}' now?",
+        qmark="❓",
+        amark="✓",
+        default=True,
+    ).execute()
