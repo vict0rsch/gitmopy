@@ -127,6 +127,7 @@ def unstage(repo: Repo, files: List[str]) -> None:
     for f in files:
         repo.git.restore("--staged", f)
 
+
 def commits_behind(repo: Repo) -> int:
     """
     Get the number of commits the local current branch is behind for each remote.
@@ -140,4 +141,20 @@ def commits_behind(repo: Repo) -> int:
     b = repo.current_branch
     return {
         r.name: len(list(repo.iter_commits(f"{b}..{r.name}/{b}"))) for r in repo.remotes
+    }
+
+
+def commits_ahead(repo: Repo) -> int:
+    """
+    Get the number of commits the local current branch is behind for each remote.
+
+    Args:
+        repo (Repo): GitPython repository object.
+
+    Returns:
+        int: Number of commits the local current branch is behind for each remote.
+    """
+    b = repo.current_branch
+    return {
+        r.name: len(list(repo.iter_commits(f"{r.name}/{b}..{b}"))) for r in repo.remotes
     }
