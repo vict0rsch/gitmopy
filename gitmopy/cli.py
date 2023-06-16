@@ -81,6 +81,29 @@ class CatchRemoteException:
         return True
 
 
+
+def patched_commit_prompt(repo: Repo, config: Dict[str, bool]) -> Dict[str, str]:
+    def _catched_prompt():
+        commit = None
+        try:
+            commit = commit_prompt(config)
+            print("commit_prompt: ", commit)
+        finally:
+            return commit
+
+    while True:
+        commit = _catched_prompt()
+        if commit:
+            return commit
+        print("\n[yellow]Quit (q) or commit again (enter)?[/yellow]")
+        should_stop = typer.prompt("q / enter", default="enter")
+        if should_stop == "q":
+            # cancel_commit(repo)
+            break
+        else:
+            print()
+
+
 def should_continue() -> bool:
     """
     Prompt the user to continue or stop the current commit loop.
@@ -279,7 +302,9 @@ def commit(
 
         # PROMPT: get user's commit details
         print("\n[u green3]Commit details:[/u green3]")
-        commit_dict = commit_prompt(config)
+        commit_dict = patched_commit_prompt(repo, config)
+        if not commit_dict:
+            break
 
         # make commit messsage
         commit_message = message_from_commit_dict(commit_dict)
