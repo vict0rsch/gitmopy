@@ -165,10 +165,10 @@ $ gitmopy commit --help
 
 ## Resources
 
-`gitmopy` is inspired by [`gitmoji-cli](https://github.com/carloscuesta/gitmoji-cli).
+`gitmopy` is inspired by [`gitmoji-cli`](https://github.com/carloscuesta/gitmoji-cli).
 
 It is built thanks to:
 
 * [`typer`](https://github.com/tiangolo/typer)
 * [`InquirePy`](https://github.com/kazhala/InquirerPy)
-* [`GitPython](https://github.com/gitpython-developers/GitPython)
+* [`GitPython`](https://github.com/gitpython-developers/GitPython)
