@@ -5,6 +5,7 @@ from typing import Dict, List
 
 from git import Repo
 from git.exc import GitCommandError
+from rich import print
 
 
 class CatchRemoteException:
@@ -179,8 +180,11 @@ def format_remotes_diff(repo: Repo) -> str:
     s = "[u green]Remotes diff:[/u green]\n"
     for r in repo.remotes:
         if behind[r.name]:
-            s += f"[orange3]behind {r.name} by {behind[r.name]} commit(s)[/orange3]\n"
+            s += f"[orange3]local is behind {r.name} by {behind[r.name]} commit(s)[/orange3]\n"
         if ahead[r.name]:
-            s += f"[plum3]ahead {r.name} by {ahead[r.name]} commit(s)[/plum3]\n"
+            s += (
+                f"[plum3]local is ahead of {r.name} by {ahead[r.name]}"
+                + " commit(s)[/plum3]\n"
+            )
 
     return s
