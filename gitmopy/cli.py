@@ -110,7 +110,7 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
 
     remotes_diff = format_remotes_diff(repo)
     if remotes_diff:
-        print("\n\n" + remotes_diff)
+        print("\n" + remotes_diff)
         prompt_txt += ", [b dodger_blue2]p[/b dodger_blue2] to push and commit again,"
 
     print(prompt_txt + " or [b red]q[/b red] to quit.", end="")
@@ -289,6 +289,13 @@ def commit(
                     break
                 elif to_add is _restart:
                     continue
+                elif not to_add:
+                    print("[yellow]No file selected, nothing to commit.[/yellow]")
+                    if should_commit_again(repo, remote):
+                        # user wants to commit again: start over
+                        continue
+                    # user wants to stop: break loop
+                    break
             else:
                 # there are staged files: list them to user
                 if add:
