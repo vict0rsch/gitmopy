@@ -4,12 +4,12 @@ Command line interface for gitmopy.
 from typing import List, Optional
 
 import git
-from git import Repo
 import typer
+from git import Repo
 from rich import print
 from typing_extensions import Annotated
 
-from gitmopy.git import CatchRemoteException, get_files_status, format_remotes_diff
+from gitmopy.git import CatchRemoteException, format_remotes_diff, get_files_status
 from gitmopy.history import gitmojis_setup, save_to_history
 from gitmopy.prompt import (
     choose_remote_prompt,
