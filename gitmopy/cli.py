@@ -30,10 +30,7 @@ from gitmopy.utils import (
 
 app = typer.Typer()
 gitmojis_setup()
-
-_stop = object()
-_restart = object()
-_cancelled = object()
+_sentinels = {k: object() for k in ["stop", "restart", "cancelled", "sync"]}
 
 
 def catch_keyboard_interrupt(func, *args, **kwargs):
@@ -58,17 +55,17 @@ def catch_keyboard_interrupt(func, *args, **kwargs):
         Function wrapper that catches typer.Abort exceptions.
 
         Returns:
-            Any: The wrapped function's return value or the ``_cancelled``
+            Any: The wrapped function's return value or the ``_sentinels["cancelled"]``
                 sentinel if the function was aborted.
         """
-        return_value = _cancelled
+        return_value = _sentinels["cancelled"]
         try:
             return_value = func(*_args, **_kwargs)
         finally:
             return return_value
 
     return_value = _func(*args, **kwargs)
-    if return_value is not _cancelled:
+    if return_value is not _sentinels["cancelled"]:
         # function was not aborted
         return return_value
 
@@ -85,11 +82,11 @@ def catch_keyboard_interrupt(func, *args, **kwargs):
 
     # user asked to quit
     if should_stop == "q":
-        return _stop
+        return _sentinels["stop"]
 
     # user wants to restart the commit process
     print()
-    return _restart
+    return _sentinels["restart"]
 
 
 def should_commit_again(repo: Repo, remote: List[str]) -> bool:
@@ -112,14 +109,21 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
     if remotes_diff:
         print("\n" + remotes_diff)
         prompt_txt += ", [b dodger_blue2]p[/b dodger_blue2] to push and commit again,"
+        prompt_txt += (
+            ", [b dodger_blue2]s[/b dodger_blue2] to sync (pull then pull) "
+            + " and commit again,"
+        )
 
     print(prompt_txt + " or [b red]q[/b red] to quit.", end="")
 
     commit_again = typer.prompt(
         "", default="enter", show_default=False, prompt_suffix=""
     )
-    if remotes_diff and commit_again == "p":
-        push_cli(repo, remote)
+    if remotes_diff:
+        if commit_again == "s":
+            pull_cli(repo, remote)
+        if commit_again in {"p", "s"}:
+            push_cli(repo, remote)
         return should_commit_again(repo, remote)
 
     commit_again = commit_again != "q"
@@ -174,6 +178,42 @@ def push_cli(repo, remote):
                                 remote.name,
                                 repo.active_branch.name,
                             )
+
+
+def pull_cli(repo, remote):
+    # pull from remotes. If several remotes, use either the values from --remote
+    # or prompt the user to choose them.
+    # If no remote, ignore push.
+    if len(repo.remotes) == 0:
+        print("[yellow]No remote found. Ignoring pull.[/yellow]")
+    else:
+        selected_remotes = set([repo.remotes[0].name])
+        if len(repo.remotes) > 1:
+            if remote:
+                # use --remote values
+                selected_remotes = set(remote)
+            else:
+                # PROMPT: choose remote
+                selected_remotes = choose_remote_prompt(repo.remotes)
+            if not selected_remotes:
+                # stop if no remote selected
+                print("[yellow]No remote selected. Aborting.[/yellow]")
+                raise typer.Exit(1)
+            selected_remotes = set(selected_remotes)
+        print()
+        color = "dodger_blue3"
+
+        # there is at least one remote to push to at this point
+        for remote in repo.remotes:
+            if remote.name in selected_remotes:
+                print(
+                    f"[{color}]Pulling from remote {remote.name}[/{color}]",
+                )
+                # push to remote, catch exception if it fails to be able to
+                # 1. continue pushing to other remotes
+                # 2. potentially set the upstream branch
+                with CatchRemoteException(remote.name):
+                    repo.git.pull(remote.name, repo.active_branch.name)
 
 
 @app.command(
@@ -285,9 +325,9 @@ def commit(
             if not status["staged"] and add:
                 # PROMPT: list files to user and add their selection
                 to_add = catch_keyboard_interrupt(git_add_prompt, status)
-                if to_add is _stop:
+                if to_add is _sentinels["stop"]:
                     break
-                elif to_add is _restart:
+                elif to_add is _sentinels["restart"]:
                     continue
                 elif not to_add:
                     print("[yellow]No file selected, nothing to commit.[/yellow]")
@@ -314,9 +354,9 @@ def commit(
         # PROMPT: get user's commit details
         print("\n[u green3]Commit details:[/u green3]")
         commit_dict = catch_keyboard_interrupt(commit_prompt, config)
-        if commit_dict is _stop:
+        if commit_dict is _sentinels["stop"]:
             break
-        elif commit_dict is _restart:
+        elif commit_dict is _sentinels["restart"]:
             continue
 
         # make commit messsage
