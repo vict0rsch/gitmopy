@@ -140,9 +140,14 @@ def commits_behind(repo: Repo) -> int:
         int: Number of commits the local current branch is behind for each remote.
     """
     b = repo.active_branch.name
-    return {
-        r.name: len(list(repo.iter_commits(f"{b}..{r.name}/{b}"))) for r in repo.remotes
-    }
+    behinds = {}
+    for r in repo.remotes:
+        try:
+            behinds[r.name] = len(list(repo.iter_commits(f"{b}..{r.name}/{b}")))
+        except GitCommandError as e:
+            if "fatal: bad revision" in str(e):
+                print(f"[yellow]Remote {r.name} does not have a branch '{b}'[/yellow]")
+    return behinds
 
 
 def commits_ahead(repo: Repo) -> int:
@@ -156,9 +161,14 @@ def commits_ahead(repo: Repo) -> int:
         int: Number of commits the local current branch is behind for each remote.
     """
     b = repo.active_branch.name
-    return {
-        r.name: len(list(repo.iter_commits(f"{r.name}/{b}..{b}"))) for r in repo.remotes
-    }
+    aheads = {}
+    for r in repo.remotes:
+        try:
+            aheads[r.name] = len(list(repo.iter_commits(f"{r.name}/{b}..{b}")))
+        except GitCommandError as e:
+            # already caught and printed in commits_behind
+            pass
+    return aheads
 
 
 def format_remotes_diff(repo: Repo) -> str:
