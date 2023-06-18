@@ -7,6 +7,8 @@ from git import Repo
 from git.exc import GitCommandError
 from rich import print
 
+from gitmopy.utils import _sentinels
+
 
 class CatchRemoteException:
     def __init__(self, remote: str):
@@ -140,9 +142,14 @@ def commits_behind(repo: Repo) -> int:
         int: Number of commits the local current branch is behind for each remote.
     """
     b = repo.active_branch.name
-    return {
-        r.name: len(list(repo.iter_commits(f"{b}..{r.name}/{b}"))) for r in repo.remotes
-    }
+    behinds = {}
+    for r in repo.remotes:
+        try:
+            behinds[r.name] = len(list(repo.iter_commits(f"{b}..{r.name}/{b}")))
+        except GitCommandError as e:
+            if "fatal: bad revision" in str(e):
+                behinds[r.name] = _sentinels["no-branch"]
+    return behinds
 
 
 def commits_ahead(repo: Repo) -> int:
@@ -156,9 +163,14 @@ def commits_ahead(repo: Repo) -> int:
         int: Number of commits the local current branch is behind for each remote.
     """
     b = repo.active_branch.name
-    return {
-        r.name: len(list(repo.iter_commits(f"{r.name}/{b}..{b}"))) for r in repo.remotes
-    }
+    aheads = {}
+    for r in repo.remotes:
+        try:
+            aheads[r.name] = len(list(repo.iter_commits(f"{r.name}/{b}..{b}")))
+        except GitCommandError as e:
+            # already caught and printed in commits_behind
+            pass
+    return aheads
 
 
 def format_remotes_diff(repo: Repo) -> str:
@@ -174,13 +186,28 @@ def format_remotes_diff(repo: Repo) -> str:
     behind = commits_behind(repo)
     ahead = commits_ahead(repo)
 
-    if not (sum(behind.values()) + sum(ahead.values())):
+    no_branch = [k for k, v in behind.items() if v is _sentinels["no-branch"]]
+
+    if (
+        not (
+            sum([b for b in behind.values() if b is not _sentinels["no-branch"]])
+            + sum(ahead.values())
+        )
+        and not no_branch
+    ):
         return ""
 
     s = "[u green]Remotes diff:[/u green]\n"
     for r in repo.remotes:
         if behind[r.name]:
-            s += f"[orange3]local is behind {r.name} by {behind[r.name]} commit(s)[/orange3]\n"
+            if behind[r.name] is _sentinels["no-branch"]:
+                b = repo.active_branch
+                s += f"[yellow]remote {r.name} does not have a branch {b}[/yellow]\n"
+                continue
+            s += (
+                f"[orange3]local is behind {r.name} by {behind[r.name]} "
+                + "commit(s)[/orange3]\n"
+            )
         if ahead[r.name]:
             s += (
                 f"[plum3]local is ahead of {r.name} by {ahead[r.name]}"

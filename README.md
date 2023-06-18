@@ -1,4 +1,4 @@
-# gitmopy
+# `gitmopy`
 
 An interactive Python implementation of the Gitmoji standard: https://gitmoji.dev/
 
@@ -77,6 +77,8 @@ $ gitmopy info
 $ gitmopy --help
 $ gitmopy commit --help
 ```
+
+⚠️ The sync feature is still experimental. It will `pull` then `push` but in the case of several remotes and the branch not existing on one of them, I recommend you deal with it with `git` manually.
 
 ## User guide
 
