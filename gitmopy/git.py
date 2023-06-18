@@ -7,6 +7,8 @@ from git import Repo
 from git.exc import GitCommandError
 from rich import print
 
+from gitmopy.utils import _sentinels
+
 
 class CatchRemoteException:
     def __init__(self, remote: str):
@@ -146,7 +148,7 @@ def commits_behind(repo: Repo) -> int:
             behinds[r.name] = len(list(repo.iter_commits(f"{b}..{r.name}/{b}")))
         except GitCommandError as e:
             if "fatal: bad revision" in str(e):
-                print(f"[yellow]Remote {r.name} does not have a branch '{b}'[/yellow]")
+                behinds[r.name] = _sentinels["no-branch"]
     return behinds
 
 
@@ -184,13 +186,28 @@ def format_remotes_diff(repo: Repo) -> str:
     behind = commits_behind(repo)
     ahead = commits_ahead(repo)
 
-    if not (sum(behind.values()) + sum(ahead.values())):
+    no_branch = [k for k, v in behind.items() if v is _sentinels["no-branch"]]
+
+    if (
+        not (
+            sum([b for b in behind.values() if b is not _sentinels["no-branch"]])
+            + sum(ahead.values())
+        )
+        and not no_branch
+    ):
         return ""
 
     s = "[u green]Remotes diff:[/u green]\n"
     for r in repo.remotes:
         if behind[r.name]:
-            s += f"[orange3]local is behind {r.name} by {behind[r.name]} commit(s)[/orange3]\n"
+            if behind[r.name] is _sentinels["no-branch"]:
+                b = repo.active_branch
+                s += f"[yellow]remote {r.name} does not have a branch {b}[/yellow]\n"
+                continue
+            s += (
+                f"[orange3]local is behind {r.name} by {behind[r.name]} "
+                + "commit(s)[/orange3]\n"
+            )
         if ahead[r.name]:
             s += (
                 f"[plum3]local is ahead of {r.name} by {ahead[r.name]}"

@@ -22,6 +22,7 @@ from gitmopy.utils import (
     APP_PATH,
     CONFIG_PATH,
     HISTORY_PATH,
+    _sentinels,
     load_config,
     message_from_commit_dict,
     print_staged_files,
@@ -30,7 +31,6 @@ from gitmopy.utils import (
 
 app = typer.Typer()
 gitmojis_setup()
-_sentinels = {k: object() for k in ["stop", "restart", "cancelled", "sync"]}
 
 
 def catch_keyboard_interrupt(func, *args, **kwargs):
@@ -105,14 +105,16 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
         + "to commit again"
     )
 
+    print()
     remotes_diff = format_remotes_diff(repo)
     if remotes_diff:
-        print("\n" + remotes_diff)
+        print(remotes_diff)
         prompt_txt += ", [b dodger_blue2]p[/b dodger_blue2] to push and commit again,"
-        prompt_txt += (
-            ", [b dodger_blue2]s[/b dodger_blue2] to sync (pull then pull) "
-            + " and commit again,"
-        )
+        if "does not have a branch" not in remotes_diff:
+            prompt_txt += (
+                " [b dodger_blue2]s[/b dodger_blue2] to sync (pull then pull) "
+                + " and commit again,"
+            )
 
     print(prompt_txt + " or [b red]q[/b red] to quit.", end="")
 

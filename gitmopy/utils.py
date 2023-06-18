@@ -39,6 +39,13 @@ HISTORY_PATH = APP_PATH / "history.json"
 Path to the history file.
 """
 
+_sentinels = {
+    k: object() for k in ["stop", "restart", "cancelled", "sync", "no-branch"]
+}
+"""
+Private constants
+"""
+
 DEFAULT_CHOICES = [
     {
         "value": "skip_scope",
