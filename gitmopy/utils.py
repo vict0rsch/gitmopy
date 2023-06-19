@@ -205,7 +205,7 @@ def terminal_separator(margin=10):
         str: Terminal separator
     """
     total = get_terminal_size().columns
-    sep = "―" * (total - 2 * margin)
+    sep = "─" * (total - 2 * margin)
     return f"{' ' * margin}{sep}{' ' * margin}"
 
 
