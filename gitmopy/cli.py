@@ -121,6 +121,7 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
     commit_again = typer.prompt(
         "", default="enter", show_default=False, prompt_suffix=""
     )
+    print("commit_again: ", commit_again)
     if remotes_diff:
         if commit_again == "s":
             pull_cli(repo, remote)
@@ -333,7 +334,7 @@ def commit(
                     continue
                 elif not to_add:
                     print("[yellow]No file selected, nothing to commit.[/yellow]")
-                    if should_commit_again(repo, remote):
+                    if keep_alive and should_commit_again(repo, remote):
                         # user wants to commit again: start over
                         continue
                     # user wants to stop: break loop
@@ -383,8 +384,12 @@ def commit(
 
         if push:
             push_cli(repo, remote)
-        if not keep_alive or not should_commit_again(repo, remote):
-            break
+        if print("\nLast chance\n") or (
+            keep_alive and should_commit_again(repo, remote)
+        ):
+            print("continueing")
+            continue
+        break
 
     print("\nDone 🥳\n")
 
