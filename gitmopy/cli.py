@@ -101,9 +101,10 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
         bool: Whether the user wants to continue or not.
     """
     gitmojis_setup()
+    print()
     print(terminal_separator())
     prompt_txt = (
-        "\n🔄 [u]Ready to commit again[/u]. Press [b green]enter[/b green] "
+        "🔄 [u]Ready to commit again[/u]. Press [b green]enter[/b green] "
         + "to commit again"
     )
 
