@@ -150,7 +150,7 @@ def message_from_commit_dict(commit_dict: Dict[str, str]) -> str:
     return message.strip()
 
 
-def separator(title: str = "", width: int = 30, sep: str = "-") -> Separator:
+def choice_separator(title: str = "", width: int = 30, sep: str = "─") -> Separator:
     """
     Create an InquirerPy separator with a title.
 
@@ -158,7 +158,7 @@ def separator(title: str = "", width: int = 30, sep: str = "-") -> Separator:
         title (str, optional): Title in-between separator characters.
             Defaults to ``""``.
         width (int, optional): Total length of sperator line. Defaults to 30.
-        sep (str, optional): Character to use around the ``title``. Defaults to ``"-"``.
+        sep (str, optional): Character to use around the ``title``. Defaults to ``"─"``.
 
     Returns:
         Separator: _description_
