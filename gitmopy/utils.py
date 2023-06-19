@@ -3,6 +3,7 @@ Utility functions and constants for ``gitmopy``.
 """
 from os.path import expandvars
 from pathlib import Path
+from shutil import get_terminal_size
 from typing import Dict, List, Union
 
 import typer
@@ -149,7 +150,7 @@ def message_from_commit_dict(commit_dict: Dict[str, str]) -> str:
     return message.strip()
 
 
-def separator(title: str = "", width: int = 30, sep: str = "-") -> Separator:
+def choice_separator(title: str = "", width: int = 30, sep: str = "─") -> Separator:
     """
     Create an InquirerPy separator with a title.
 
@@ -157,7 +158,7 @@ def separator(title: str = "", width: int = 30, sep: str = "-") -> Separator:
         title (str, optional): Title in-between separator characters.
             Defaults to ``""``.
         width (int, optional): Total length of sperator line. Defaults to 30.
-        sep (str, optional): Character to use around the ``title``. Defaults to ``"-"``.
+        sep (str, optional): Character to use around the ``title``. Defaults to ``"─"``.
 
     Returns:
         Separator: _description_
@@ -194,6 +195,18 @@ def safe_capitalize(s):
     if len(s) == 1:
         return s.upper()
     return s[0].upper() + s[1:]
+
+
+def terminal_separator(margin=10):
+    """
+    Create a separator for the terminal.
+
+    Returns:
+        str: Terminal separator
+    """
+    total = get_terminal_size().columns
+    sep = "─" * (total - 2 * margin)
+    return f"{' ' * margin}{sep}{' ' * margin}"
 
 
 # https://github.com/carloscuesta/gitmoji/blob/master/packages/gitmojis/src/gitmojis.json

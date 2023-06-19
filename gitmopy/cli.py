@@ -27,6 +27,7 @@ from gitmopy.utils import (
     message_from_commit_dict,
     print_staged_files,
     resolve_path,
+    terminal_separator,
 )
 
 app = typer.Typer()
@@ -100,8 +101,10 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
         bool: Whether the user wants to continue or not.
     """
     gitmojis_setup()
+    print()
+    print(terminal_separator())
     prompt_txt = (
-        "\n🔄 [u]Ready to commit again[/u]. Press [b green]enter[/b green] "
+        "🔄 [u]Ready to commit again[/u]. Press [b green]enter[/b green] "
         + "to commit again"
     )
 
@@ -122,11 +125,11 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
         "", default="enter", show_default=False, prompt_suffix=""
     )
     if remotes_diff:
-        if commit_again == "s":
-            pull_cli(repo, remote)
         if commit_again in {"p", "s"}:
+            if commit_again == "s":
+                pull_cli(repo, remote)
             push_cli(repo, remote)
-        return should_commit_again(repo, remote)
+            return should_commit_again(repo, remote)
 
     commit_again = commit_again != "q"
 
@@ -333,7 +336,7 @@ def commit(
                     continue
                 elif not to_add:
                     print("[yellow]No file selected, nothing to commit.[/yellow]")
-                    if should_commit_again(repo, remote):
+                    if keep_alive and should_commit_again(repo, remote):
                         # user wants to commit again: start over
                         continue
                     # user wants to stop: break loop
@@ -383,8 +386,12 @@ def commit(
 
         if push:
             push_cli(repo, remote)
-        if not keep_alive or not should_commit_again(repo, remote):
-            break
+
+        if keep_alive and should_commit_again(repo, remote):
+            # user wants to commit again
+            continue
+        # stop here
+        break
 
     print("\nDone 🥳\n")
 

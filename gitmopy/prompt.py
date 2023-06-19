@@ -19,7 +19,7 @@ from gitmopy.utils import (
     load_config,
     safe_capitalize,
     save_config,
-    separator,
+    choice_separator,
 )
 
 
@@ -222,12 +222,12 @@ def git_add_prompt(status: Dict[str, List[str]]) -> List[str]:
     """
     choices = []
     if len(status["unstaged"]) > 0:
-        choices.append(separator("Unstaged files"))
+        choices.append(choice_separator("Unstaged files"))
     for s in status["unstaged"]:
         choices.append(Choice(s, s, True))
 
     if len(status["untracked"]) > 0:
-        choices.append(separator("Untracked files"))
+        choices.append(choice_separator("Untracked files"))
     for s in status["untracked"]:
         choices.append(Choice(s, s, True))
 
