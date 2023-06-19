@@ -108,7 +108,6 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
     print()
     remotes_diff = format_remotes_diff(repo)
     if remotes_diff:
-        print(remotes_diff)
         prompt_txt += ", [b dodger_blue2]p[/b dodger_blue2] to push and commit again,"
         if "does not have a branch" not in remotes_diff:
             prompt_txt += (
@@ -123,15 +122,13 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
     )
     print("commit_again: ", commit_again)
     if remotes_diff:
-        if commit_again == "s":
-            pull_cli(repo, remote)
         if commit_again in {"p", "s"}:
+            if commit_again == "s":
+                pull_cli(repo, remote)
             push_cli(repo, remote)
-        print("internal recusion should_commit_again ")
-        return should_commit_again(repo, remote)
+            return should_commit_again(repo, remote)
 
     commit_again = commit_again != "q"
-    print("commit_again: ", commit_again)
 
     if commit_again:
         print()
@@ -386,11 +383,11 @@ def commit(
 
         if push:
             push_cli(repo, remote)
-        if print("\nLast chance\n") or (
-            keep_alive and should_commit_again(repo, remote)
-        ):
-            print("continueing")
+
+        if keep_alive and should_commit_again(repo, remote):
+            # user wants to commit again
             continue
+        # stop here
         break
 
     print("\nDone 🥳\n")
