@@ -111,6 +111,7 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
     print()
     remotes_diff = format_remotes_diff(repo)
     if remotes_diff:
+        print(remotes_diff)
         prompt_txt += ", [b dodger_blue2]p[/b dodger_blue2] to push and commit again,"
         if "does not have a branch" not in remotes_diff:
             prompt_txt += (
@@ -123,7 +124,6 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
     commit_again = typer.prompt(
         "", default="enter", show_default=False, prompt_suffix=""
     )
-    print("commit_again: ", commit_again)
     if remotes_diff:
         if commit_again in {"p", "s"}:
             if commit_again == "s":
