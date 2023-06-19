@@ -3,6 +3,7 @@ Utility functions and constants for ``gitmopy``.
 """
 from os.path import expandvars
 from pathlib import Path
+from shutil import get_terminal_size
 from typing import Dict, List, Union
 
 import typer
@@ -194,6 +195,18 @@ def safe_capitalize(s):
     if len(s) == 1:
         return s.upper()
     return s[0].upper() + s[1:]
+
+
+def terminal_separator(margin=10):
+    """
+    Create a separator for the terminal.
+
+    Returns:
+        str: Terminal separator
+    """
+    total = get_terminal_size().columns
+    sep = "―" * (total - 2 * margin)
+    return f"{' ' * margin}{sep}{' ' * margin}"
 
 
 # https://github.com/carloscuesta/gitmoji/blob/master/packages/gitmojis/src/gitmojis.json

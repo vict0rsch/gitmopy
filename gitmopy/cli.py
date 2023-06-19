@@ -27,6 +27,7 @@ from gitmopy.utils import (
     message_from_commit_dict,
     print_staged_files,
     resolve_path,
+    terminal_separator,
 )
 
 app = typer.Typer()
@@ -100,6 +101,7 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
         bool: Whether the user wants to continue or not.
     """
     gitmojis_setup()
+    print(terminal_separator())
     prompt_txt = (
         "\n🔄 [u]Ready to commit again[/u]. Press [b green]enter[/b green] "
         + "to commit again"
