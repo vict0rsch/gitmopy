@@ -127,9 +127,11 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
             pull_cli(repo, remote)
         if commit_again in {"p", "s"}:
             push_cli(repo, remote)
+        print("internal recusion should_commit_again ")
         return should_commit_again(repo, remote)
 
     commit_again = commit_again != "q"
+    print("commit_again: ", commit_again)
 
     if commit_again:
         print()
