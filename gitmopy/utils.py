@@ -40,6 +40,18 @@ HISTORY_PATH = APP_PATH / "history.json"
 Path to the history file.
 """
 
+COLORS = {
+    "r": "red",
+    "g": "green3",
+    "b": "dodger_blue3",
+    "y": "yellow3",
+    "o": "orange3",
+    "p": "plum3",
+}
+"""
+Rich colours for prints.
+"""
+
 _sentinels = {
     k: object() for k in ["stop", "restart", "cancelled", "sync", "no-branch"]
 }
@@ -77,6 +89,25 @@ DEFAULT_CONFIG = {c["value"]: c["default"] for c in DEFAULT_CHOICES}
 """
 Default gitmopy configuration.
 """
+
+
+def col(txt, color, bold=False):
+    """
+    Return a coloured string with Rich.
+
+    Args:
+        txt (str): String to colour.
+        colour (str): Colour to use.
+        bold (bool, optional): Whether to use bold font. Defaults to False.
+
+    Returns:
+        str: Coloured string.
+    """
+    return (
+        f"[{COLORS[color]}]{txt}[/]"
+        if not bold
+        else f"[{COLORS[color]} bold]{txt}[/]"
+    )
 
 
 def load_config() -> Dict[str, bool]:
