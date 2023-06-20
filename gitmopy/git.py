@@ -85,19 +85,22 @@ def has_upstreams(
             branch.
     """
     fetch_all(repo)
-    remotes = {r: None for r in remotes}
+    remote_has_upstream = {
+        r.name if isinstance(r, Remote) else r: None for r in remotes
+    }
     for r in remotes:
         if isinstance(r, Remote):
             r = r.name
         assert isinstance(r, str)
         try:
-            remotes[r] = repo.git.branch("--list", f"{r}/{branch_name}")
+            repo.git.branch("--list", f"{r}/{branch_name}")
+            remote_has_upstream[r] = True
         except GitCommandError as e:
             if "fatal: not a valid revision" in str(e):
-                remotes[r] = False
+                remote_has_upstream[r] = False
             else:
                 raise e
-    return remotes
+    return remote_has_upstream
 
 
 def get_staged(repo: Repo) -> List[str]:
