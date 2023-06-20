@@ -8,8 +8,11 @@ from typing import Dict, List, Union
 
 import typer
 from InquirerPy.separator import Separator
-from rich import print
+from rich.console import Console
 from yaml import safe_dump, safe_load
+
+console = Console()
+print = console.print
 
 
 def resolve_path(path: Union[str, Path]) -> Path:
@@ -38,6 +41,18 @@ Path to the configuration file.
 HISTORY_PATH = APP_PATH / "history.json"
 """
 Path to the history file.
+"""
+
+COLORS = {
+    "r": "red",
+    "g": "green3",
+    "b": "dodger_blue3",
+    "y": "yellow3",
+    "o": "orange3",
+    "p": "plum3",
+}
+"""
+Rich colours for prints.
 """
 
 _sentinels = {
@@ -77,6 +92,23 @@ DEFAULT_CONFIG = {c["value"]: c["default"] for c in DEFAULT_CHOICES}
 """
 Default gitmopy configuration.
 """
+
+
+def col(txt, color, bold=False):
+    """
+    Return a coloured string with Rich.
+
+    Args:
+        txt (str): String to colour.
+        colour (str): Colour to use.
+        bold (bool, optional): Whether to use bold font. Defaults to False.
+
+    Returns:
+        str: Coloured string.
+    """
+    return (
+        f"[{COLORS[color]}]{txt}[/]" if not bold else f"[{COLORS[color]} bold]{txt}[/]"
+    )
 
 
 def load_config() -> Dict[str, bool]:

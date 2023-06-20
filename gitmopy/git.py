@@ -1,13 +1,12 @@
 """
 `gitmopy`'s Git-related utility functions.
 """
-from typing import Dict, List
+from typing import Dict, List, Union
 
-from git import Repo
+from git import Repo, Remote
 from git.exc import GitCommandError
-from rich import print
 
-from gitmopy.utils import _sentinels
+from gitmopy.utils import _sentinels, print, col
 
 
 class CatchRemoteException:
@@ -51,13 +50,58 @@ class CatchRemoteException:
         """
         if exc_type is GitCommandError:
             self.error = True
-            self.set_upsteam = "has no upstream branch" in exc_value.stderr
             print(
                 f"[bold red]Error:[/bold red] could not push to {self.remote}:",
             )
             print("[red]" + exc_value.stderr + "[/red]")
 
         return True
+
+
+def fetch_all(repo):
+    """
+    Fetch all remotes of a GitPython repository.
+
+    Args:
+        repo (git.Repo): Repository to fetch remotes from.
+    """
+    for r in repo.remotes:
+        r.fetch()
+
+
+def has_upstreams(
+    repo: Repo, remotes: List[Union[str, Remote]], branch_name: str
+) -> Dict[str, bool]:
+    """
+    Check which remotes have a branch with a given name.
+
+    Args:
+        repo (git.Repo): Repository to check branches from.
+        remotes (List[Union[str, Remote]]): List of remotes to check.
+        branch_name (str): Name of the branch to check.
+
+    Returns:
+        Dict[str, bool]: Dictionnary of booleans indicating if each remote has the
+            branch.
+    """
+
+    fetch_all(repo)
+    remote_has_upstream = {
+        r.name if isinstance(r, Remote) else r: None for r in remotes
+    }
+    for r in remotes:
+        if isinstance(r, Remote):
+            r = r.name
+        assert isinstance(r, str)
+        try:
+            repo.git.branch("--list", f"{r}/{branch_name}")
+            remote_has_upstream[r] = True
+        except GitCommandError as e:
+            if "fatal: not a valid revision" in str(e):
+                remote_has_upstream[r] = False
+            else:
+                raise e
+    return remote_has_upstream
 
 
 def get_staged(repo: Repo) -> List[str]:
@@ -167,7 +211,7 @@ def commits_ahead(repo: Repo) -> int:
     for r in repo.remotes:
         try:
             aheads[r.name] = len(list(repo.iter_commits(f"{r.name}/{b}..{b}")))
-        except GitCommandError as e:
+        except GitCommandError:
             # already caught and printed in commits_behind
             pass
     return aheads
@@ -197,21 +241,15 @@ def format_remotes_diff(repo: Repo) -> str:
     ):
         return ""
 
-    s = "[u green]Remotes diff:[/u green]\n"
+    s = f"[u]{col('Remotes diff:', 'g')}[/u]\n"
     for r in repo.remotes:
         if behind[r.name]:
             if behind[r.name] is _sentinels["no-branch"]:
                 b = repo.active_branch
-                s += f"[yellow]remote {r.name} does not have a branch {b}[/yellow]\n"
+                s += col(f"remote {r.name} does not have a branch {b}\n", "y")
                 continue
-            s += (
-                f"[orange3]local is behind {r.name} by {behind[r.name]} "
-                + "commit(s)[/orange3]\n"
-            )
+            s += col(f"local is behind {r.name} by {behind[r.name]} commit(s)\n", "o")
         if ahead[r.name]:
-            s += (
-                f"[plum3]local is ahead of {r.name} by {ahead[r.name]}"
-                + " commit(s)[/plum3]\n"
-            )
+            s += col(f"local is ahead of {r.name} by {ahead[r.name]} commit(s)\n", "p")
 
     return s
