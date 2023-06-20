@@ -122,7 +122,7 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
         prompt_txt += f", {col('p', 'b', True)} to push and commit again,"
         if "does not have a branch" not in remotes_diff:
             prompt_txt += (
-                f" {col('s', 'b', True)} to sync (pull then pull) "
+                f" {col('s', 'b', True)} to sync (pull then pull)"
                 + " and commit again,"
             )
 
