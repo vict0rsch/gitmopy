@@ -226,9 +226,14 @@ def pull_cli(repo, remote_cli_args):
         # there is at least one remote to push to at this point
         for remote in repo.remotes:
             if remote.name in selected_remotes:
-                print(col(f"Pulling from remote {remote.name}", "b"))
-                with CatchRemoteException(remote.name):
-                    repo.git.pull(remote.name, repo.active_branch.name)
+                wait = col(f"Pulling from remote {remote.name}...", "o")
+                done = col(f"Pulled from remote {remote.name}", "b", True)
+                with console.status(wait):
+                    cre = None
+                    with CatchRemoteException(remote.name) as cre:
+                        repo.git.pull(remote.name, repo.active_branch.name)
+                    if cre and not cre.error:
+                        print(done)
 
 
 @app.command(
