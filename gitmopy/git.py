@@ -6,7 +6,7 @@ from typing import Dict, List, Union
 from git import Repo, Remote
 from git.exc import GitCommandError
 
-from gitmopy.utils import _sentinels, print
+from gitmopy.utils import _sentinels, print, col
 
 
 class CatchRemoteException:
@@ -241,21 +241,15 @@ def format_remotes_diff(repo: Repo) -> str:
     ):
         return ""
 
-    s = "[u green]Remotes diff:[/u green]\n"
+    s = f"[u]{col('Remotes diff:', 'g')}[/u]\n"
     for r in repo.remotes:
         if behind[r.name]:
             if behind[r.name] is _sentinels["no-branch"]:
                 b = repo.active_branch
-                s += f"[yellow]remote {r.name} does not have a branch {b}[/yellow]\n"
+                s += col(f"remote {r.name} does not have a branch {b}\n", "y")
                 continue
-            s += (
-                f"[orange3]local is behind {r.name} by {behind[r.name]} "
-                + "commit(s)[/orange3]\n"
-            )
+            s += col(f"local is behind {r.name} by {behind[r.name]} commit(s)\n", "o")
         if ahead[r.name]:
-            s += (
-                f"[plum3]local is ahead of {r.name} by {ahead[r.name]}"
-                + " commit(s)[/plum3]\n"
-            )
+            s += col(f"local is ahead of {r.name} by {ahead[r.name]} commit(s)\n", "p")
 
     return s
