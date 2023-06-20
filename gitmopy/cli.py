@@ -23,6 +23,7 @@ from gitmopy.utils import (
     CONFIG_PATH,
     HISTORY_PATH,
     _sentinels,
+    col,
     load_config,
     message_from_commit_dict,
     print_staged_files,
@@ -104,7 +105,7 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
     print()
     print(terminal_separator())
     prompt_txt = (
-        "🔄 [u]Ready to commit again[/u]. Press [b green]enter[/b green] "
+        f"🔄 [u]Ready to commit again[/u]. Press {col('enter', 'g', True)} "
         + "to commit again"
     )
 
@@ -112,14 +113,14 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
     remotes_diff = format_remotes_diff(repo)
     if remotes_diff:
         print(remotes_diff)
-        prompt_txt += ", [b dodger_blue2]p[/b dodger_blue2] to push and commit again,"
+        prompt_txt += f", {col('p', 'b', True)} to push and commit again,"
         if "does not have a branch" not in remotes_diff:
             prompt_txt += (
-                " [b dodger_blue2]s[/b dodger_blue2] to sync (pull then pull) "
+                f" {col('s', 'b', True)} to sync (pull then pull) "
                 + " and commit again,"
             )
 
-    print(prompt_txt + " or [b red]q[/b red] to quit.", end="")
+    print(prompt_txt + f" or {col('q', 'r', True)} to quit.", end="")
 
     commit_again = typer.prompt(
         "", default="enter", show_default=False, prompt_suffix=""
@@ -185,38 +186,32 @@ def push_cli(repo, remote):
                             )
 
 
-def pull_cli(repo, remote):
+def pull_cli(repo, remote_cli_args):
     # pull from remotes. If several remotes, use either the values from --remote
     # or prompt the user to choose them.
     # If no remote, ignore push.
     if len(repo.remotes) == 0:
-        print("[yellow]No remote found. Ignoring pull.[/yellow]")
+        print(col("No remote found. Ignoring pull.", "y"))
     else:
         selected_remotes = set([repo.remotes[0].name])
         if len(repo.remotes) > 1:
-            if remote:
+            if remote_cli_args:
                 # use --remote values
-                selected_remotes = set(remote)
+                selected_remotes = set(remote_cli_args)
             else:
                 # PROMPT: choose remote
                 selected_remotes = choose_remote_prompt(repo.remotes)
             if not selected_remotes:
                 # stop if no remote selected
-                print("[yellow]No remote selected. Aborting.[/yellow]")
+                print(col("No remote selected. Aborting.", "y"))
                 raise typer.Exit(1)
             selected_remotes = set(selected_remotes)
         print()
-        color = "dodger_blue3"
 
         # there is at least one remote to push to at this point
         for remote in repo.remotes:
             if remote.name in selected_remotes:
-                print(
-                    f"[{color}]Pulling from remote {remote.name}[/{color}]",
-                )
-                # push to remote, catch exception if it fails to be able to
-                # 1. continue pushing to other remotes
-                # 2. potentially set the upstream branch
+                print(col(f"Pulling from remote {remote.name}", "b"))
                 with CatchRemoteException(remote.name):
                     repo.git.pull(remote.name, repo.active_branch.name)
 
@@ -300,13 +295,12 @@ def commit(
             to_add = []
             if not dry and not sum([len(v) for v in status.values()]):
                 # no files to commit
+                print(col("Nothing to commit.", "y"))
                 if not keep_alive:
                     # user does not wand to commit continuously
-                    print("[yellow]Nothing to commit.[/yellow]")
                     raise typer.Exit(0)
 
                 # wait for user input
-                print("[yellow]Nothing to commit.[/yellow]")
                 if should_commit_again(repo, remote):
                     # user wants to commit again: start over
                     continue
@@ -317,15 +311,15 @@ def commit(
             # no staged files and user does not want to add: abort
             if not status["staged"] and not add:
                 print(
-                    "\n[yellow]"
-                    + "No staged files. Stage files yourself or use [b]--add[/b]"
-                    + " to add all unstaged files.[/yellow]\n"
+                    col(
+                        +"\nNo staged files. Stage files yourself or use [b]--add[/b]"
+                        + " to add all unstaged files.\n",
+                        "y",
+                    )
                 )
                 raise typer.Exit(1)
             if remote and not push:
-                print(
-                    "\n[yellow]Ignoring --remote flag because --push is not set[/yellow]\n"
-                )
+                print(col("\nIgnoring --remote flag because --push is not set\n", "y"))
             # no staged files fbut user wants to add: start prompt
             if not status["staged"] and add:
                 # PROMPT: list files to user and add their selection
@@ -335,7 +329,7 @@ def commit(
                 elif to_add is _sentinels["restart"]:
                     continue
                 elif not to_add:
-                    print("[yellow]No file selected, nothing to commit.[/yellow]")
+                    print(col("No file selected, nothing to commit.", "y"))
                     if keep_alive and should_commit_again(repo, remote):
                         # user wants to commit again: start over
                         continue
@@ -345,8 +339,9 @@ def commit(
                 # there are staged files: list them to user
                 if add:
                     print(
-                        "[yellow]Ignoring --add flag because the stage is"
-                        + " not empty[/yellow]\n"
+                        col(
+                            "Ignoring --add flag because the stage is not empty.\n", "y"
+                        )
                     )
 
         # load gitmopy's configuraltion from yaml file
@@ -357,7 +352,7 @@ def commit(
             print_staged_files(to_add or status["staged"])
 
         # PROMPT: get user's commit details
-        print("\n[u green3]Commit details:[/u green3]")
+        print(f"\n[u]{col('Commit details:', 'g')}[/u]")
         commit_dict = catch_keyboard_interrupt(commit_prompt, config)
         if commit_dict is _sentinels["stop"]:
             break
@@ -423,7 +418,7 @@ def info():
     if CONFIG_PATH:
         print("  config  :", str(CONFIG_PATH))
     config = load_config()
-    print("\n[b u green3]Current configuration:[/b u green3]")
+    print(f"\n[u]{col('Current configuration:', 'b', True)}[/u]")
     max_l = max([len(k) for k in config.keys()])
     for k, v in config.items():
         print(f"  {k:{max_l}}: {v}")
