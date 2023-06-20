@@ -49,6 +49,7 @@ class CatchRemoteException:
             bool: True. This allows to always catch the exception.
         """
         if exc_type is GitCommandError:
+            self.error = True
             print(
                 f"[bold red]Error:[/bold red] could not push to {self.remote}:",
             )
@@ -210,7 +211,7 @@ def commits_ahead(repo: Repo) -> int:
     for r in repo.remotes:
         try:
             aheads[r.name] = len(list(repo.iter_commits(f"{r.name}/{b}..{b}")))
-        except GitCommandError as e:
+        except GitCommandError:
             # already caught and printed in commits_behind
             pass
     return aheads
