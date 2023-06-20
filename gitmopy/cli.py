@@ -9,7 +9,12 @@ from git import Repo
 from rich import print
 from typing_extensions import Annotated
 
-from gitmopy.git import CatchRemoteException, format_remotes_diff, get_files_status
+from gitmopy.git import (
+    CatchRemoteException,
+    format_remotes_diff,
+    get_files_status,
+    has_upstreams,
+)
 from gitmopy.history import gitmojis_setup, save_to_history
 from gitmopy.prompt import (
     choose_remote_prompt,
@@ -145,8 +150,9 @@ def push_cli(repo, remote):
     # or prompt the user to choose them.
     # If no remote, ignore push.
     if len(repo.remotes) == 0:
-        print("[yellow]No remote found. Ignoring push.[/yellow]")
+        print(col("No remote found. Ignoring push.", "y"))
     else:
+        # default: contain "origin"
         selected_remotes = set([repo.remotes[0].name])
         if len(repo.remotes) > 1:
             if remote:
@@ -157,33 +163,35 @@ def push_cli(repo, remote):
                 selected_remotes = choose_remote_prompt(repo.remotes)
             if not selected_remotes:
                 # stop if no remote selected
-                print("[yellow]No remote selected. Aborting.[/yellow]")
-                raise typer.Exit(1)
+                print(col("No remote selected. Aborting.", "y"))
+                raise typer.Abort()
             selected_remotes = set(selected_remotes)
         print()
-        color = "dodger_blue3"
+
+        remote_upstreams = has_upstreams(
+            repo, selected_remotes, repo.active_branch.name
+        )
 
         # there is at least one remote to push to at this point
         for remote in repo.remotes:
             if remote.name in selected_remotes:
-                print(
-                    f"[{color}]Pushing to remote {remote.name}[/{color}]",
-                )
+                print(col(f"Pushing to remote {remote.name}", "b"))
                 # push to remote, catch exception if it fails to be able to
                 # 1. continue pushing to other remotes
                 # 2. potentially set the upstream branch
-                with CatchRemoteException(remote.name) as cre:
-                    repo.git.push(remote.name, repo.active_branch.name)
-                if cre.set_upsteam:
+                set_upstream = False
+                if not remote_upstreams[remote.name]:
                     set_upstream = set_upstream_prompt(remote.name)
-                    if set_upstream:
-                        # user wants to set the upstream branch: try again
-                        with CatchRemoteException(remote.name) as cre:
-                            repo.git.push(
-                                "--set-upstream",
-                                remote.name,
-                                repo.active_branch.name,
-                            )
+                if set_upstream:
+                    with CatchRemoteException(remote.name):
+                        repo.git.push(
+                            "--set-upstream",
+                            remote.name,
+                            repo.active_branch.name,
+                        )
+                else:
+                    with CatchRemoteException(remote.name):
+                        repo.git.push(remote.name, repo.active_branch.name)
 
 
 def pull_cli(repo, remote_cli_args):
