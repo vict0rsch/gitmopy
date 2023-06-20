@@ -133,6 +133,7 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
     )
     if remotes_diff:
         if commit_again in {"p", "s"}:
+            print()
             if commit_again == "s":
                 pull_cli(repo, remote)
             push_cli(repo, remote)
@@ -167,7 +168,6 @@ def push_cli(repo, remote):
                 print(col("No remote selected. Aborting.", "y"))
                 raise typer.Abort()
             selected_remotes = set(selected_remotes)
-        print()
 
         with console.status(col("Fetching remotes...", "o")):
             remote_upstreams = has_upstreams(
