@@ -8,8 +8,11 @@ from typing import Dict, List, Union
 
 import typer
 from InquirerPy.separator import Separator
-from rich import print
+from rich.console import Console
 from yaml import safe_dump, safe_load
+
+console = Console()
+print = console.print
 
 
 def resolve_path(path: Union[str, Path]) -> Path:
@@ -104,9 +107,7 @@ def col(txt, color, bold=False):
         str: Coloured string.
     """
     return (
-        f"[{COLORS[color]}]{txt}[/]"
-        if not bold
-        else f"[{COLORS[color]} bold]{txt}[/]"
+        f"[{COLORS[color]}]{txt}[/]" if not bold else f"[{COLORS[color]} bold]{txt}[/]"
     )
 
 

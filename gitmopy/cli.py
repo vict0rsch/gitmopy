@@ -6,7 +6,6 @@ from typing import List, Optional
 import git
 import typer
 from git import Repo
-from rich import print
 from typing_extensions import Annotated
 
 from gitmopy.git import (
@@ -31,6 +30,7 @@ from gitmopy.utils import (
     col,
     load_config,
     message_from_commit_dict,
+    print,
     print_staged_files,
     resolve_path,
     terminal_separator,

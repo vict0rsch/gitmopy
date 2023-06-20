@@ -9,9 +9,7 @@ import json
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from rich import print
-
-from gitmopy.utils import GITMOJIS, HISTORY_PATH, load_config
+from gitmopy.utils import GITMOJIS, HISTORY_PATH, load_config, print
 
 HISTORY = []
 
