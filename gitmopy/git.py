@@ -1,9 +1,9 @@
 """
 `gitmopy`'s Git-related utility functions.
 """
-from typing import Dict, List
+from typing import Dict, List, Union
 
-from git import Repo
+from git import Repo, Remote
 from git.exc import GitCommandError
 from rich import print
 
@@ -50,14 +50,54 @@ class CatchRemoteException:
             bool: True. This allows to always catch the exception.
         """
         if exc_type is GitCommandError:
-            self.error = True
-            self.set_upsteam = "has no upstream branch" in exc_value.stderr
             print(
                 f"[bold red]Error:[/bold red] could not push to {self.remote}:",
             )
             print("[red]" + exc_value.stderr + "[/red]")
 
         return True
+
+
+def fetch_all(repo):
+    """
+    Fetch all remotes of a GitPython repository.
+
+    Args:
+        repo (git.Repo): Repository to fetch remotes from.
+    """
+    for r in repo.remotes:
+        r.fetch()
+
+
+def has_upstreams(
+    repo: Repo, remotes: List[Union[str, Remote]], branch_name: str
+) -> Dict[str, bool]:
+    """
+    Check which remotes have a branch with a given name.
+
+    Args:
+        repo (git.Repo): Repository to check branches from.
+        remotes (List[Union[str, Remote]]): List of remotes to check.
+        branch_name (str): Name of the branch to check.
+
+    Returns:
+        Dict[str, bool]: Dictionnary of booleans indicating if each remote has the
+            branch.
+    """
+    fetch_all(repo)
+    remotes = {r: None for r in remotes}
+    for r in remotes:
+        if isinstance(r, Remote):
+            r = r.name
+        assert isinstance(r, str)
+        try:
+            remotes[r] = repo.git.branch("--list", f"{r}/{branch_name}")
+        except GitCommandError as e:
+            if "fatal: not a valid revision" in str(e):
+                remotes[r] = False
+            else:
+                raise e
+    return remotes
 
 
 def get_staged(repo: Repo) -> List[str]:
