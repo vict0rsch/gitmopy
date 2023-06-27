@@ -284,3 +284,25 @@ def set_upstream_prompt(remote_name: str) -> bool:
         amark="✓",
         default=True,
     ).execute()
+
+
+def what_now_prompt(choices: Dict[str, str]) -> str:
+    """
+    Prompt the user to select what to do next. Choices must be a
+    dict like `{value: name}`
+
+    Args:
+        choices (Dict[str, str]): Available choices.
+
+    Returns:
+        str: User's choice.
+    """
+    choices = [Choice(k, v, True) for k, v in choices.items()]
+    return inquirer.select(
+        message="What do you want to do now?",
+        choices=choices,
+        qmark="❓",
+        amark="✓",
+        default=choices[0],
+        cycle=True,
+    ).execute()
