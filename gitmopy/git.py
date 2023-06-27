@@ -90,9 +90,10 @@ def has_upstreams(
         r.name if isinstance(r, Remote) else r: False for r in remotes
     }
     remote_refs = {
-        ref.remote_name: ref.name.removeprefix(ref.remote_name + "/") == branch_name
+        ref.remote_name: True
         for ref in repo.refs
         if ref.is_remote()
+        and ref.name.removeprefix(ref.remote_name + "/") == branch_name
     }
     remote_has_upstream.update(remote_refs)
 
