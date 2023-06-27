@@ -27,6 +27,7 @@ from gitmopy.utils import (
     APP_PATH,
     CONFIG_PATH,
     HISTORY_PATH,
+    COLORS,
     _sentinels,
     col,
     console,
@@ -163,7 +164,7 @@ def push_cli(repo, remote):
                 raise typer.Abort()
             selected_remotes = set(selected_remotes)
 
-        with console.status(col("Fetching remotes...", "o")):
+        with console.status(col("Fetching remotes...", "o"), spinner_style=COLORS["o"]):
             remote_upstreams = has_upstreams(
                 repo, selected_remotes, repo.active_branch.name
             )
