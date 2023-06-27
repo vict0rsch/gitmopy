@@ -21,6 +21,7 @@ from gitmopy.prompt import (
     config_prompt,
     git_add_prompt,
     set_upstream_prompt,
+    what_now_prompt,
 )
 from gitmopy.utils import (
     APP_PATH,
@@ -110,36 +111,29 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
     gitmojis_setup()
     print()
     print(terminal_separator())
-    prompt_txt = (
-        f"🔄 [u]Ready to commit again[/u]. Press {col('enter', 'g', True)} "
-        + "to commit again"
-    )
+    print("\n🔄 [u]Ready to commit again[/u].")
+    choices = {"c": "Commit again"}
 
     print()
     remotes_diff = format_remotes_diff(repo)
     if remotes_diff:
         print(remotes_diff)
-        prompt_txt += f", {col('p', 'b', True)} to push and commit again,"
+        choices["p"] = "Push and commit again"
         if "does not have a branch" not in remotes_diff:
-            prompt_txt += (
-                f" {col('s', 'b', True)} to sync (pull then pull)"
-                + " and commit again,"
-            )
+            choices["s"] = "Sync (pull then push) and commit again"
 
-    print(prompt_txt + f" or {col('q', 'r', True)} to quit.", end="")
+    choices["q"] = "Quit gitmopy"
+    choice = what_now_prompt(choices)
 
-    commit_again = typer.prompt(
-        "", default="enter", show_default=False, prompt_suffix=""
-    )
     if remotes_diff:
-        if commit_again in {"p", "s"}:
+        if choice in {"p", "s"}:
             print()
-            if commit_again == "s":
+            if choice == "s":
                 pull_cli(repo, remote)
             push_cli(repo, remote)
             return should_commit_again(repo, remote)
 
-    commit_again = commit_again != "q"
+    commit_again = choice != "q"
 
     if commit_again:
         print()
