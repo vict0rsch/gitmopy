@@ -177,6 +177,9 @@ def push_cli(repo, remote):
                 set_upstream = False
                 if not remote_upstreams[remote.name]:
                     set_upstream = set_upstream_prompt(remote.name)
+                    if not set_upstream:
+                        print(col(f"Skipping remote {remote.name}.", "y"))
+                        continue
                 with console.status(wait):
                     # push to remote, catch exception if it fails to be able to
                     # 1. continue pushing to other remotes
