@@ -174,13 +174,16 @@ def push_cli(repo, remote):
             if remote.name in selected_remotes:
                 wait = col(f"Pushing to remote {remote.name}...", "o")
                 done = col(f"Pushed to remote {remote.name}", "b", True)
+                set_upstream = False
+                if not remote_upstreams[remote.name]:
+                    set_upstream = set_upstream_prompt(remote.name)
+                    if not set_upstream:
+                        print(col(f"Skipping remote {remote.name}.", "y"))
+                        continue
                 with console.status(wait):
                     # push to remote, catch exception if it fails to be able to
                     # 1. continue pushing to other remotes
                     # 2. potentially set the upstream branch
-                    set_upstream = False
-                    if not remote_upstreams[remote.name]:
-                        set_upstream = set_upstream_prompt(remote.name)
                     cre = None
                     if set_upstream:
                         with CatchRemoteException(remote.name) as cre:
@@ -189,6 +192,8 @@ def push_cli(repo, remote):
                                 remote.name,
                                 repo.active_branch.name,
                             )
+                        if not cre.error:
+                            done += col(" (upstream branch created)", "b", True)
                     else:
                         with CatchRemoteException(remote.name) as cre:
                             repo.git.push(remote.name, repo.active_branch.name)

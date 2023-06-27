@@ -87,20 +87,16 @@ def has_upstreams(
 
     fetch_all(repo)
     remote_has_upstream = {
-        r.name if isinstance(r, Remote) else r: None for r in remotes
+        r.name if isinstance(r, Remote) else r: False for r in remotes
     }
-    for r in remotes:
-        if isinstance(r, Remote):
-            r = r.name
-        assert isinstance(r, str)
-        try:
-            repo.git.branch("--list", f"{r}/{branch_name}")
-            remote_has_upstream[r] = True
-        except GitCommandError as e:
-            if "fatal: not a valid revision" in str(e):
-                remote_has_upstream[r] = False
-            else:
-                raise e
+    remote_refs = {
+        ref.remote_name: True
+        for ref in repo.refs
+        if ref.is_remote()
+        and ref.name.removeprefix(ref.remote_name + "/") == branch_name
+    }
+    remote_has_upstream.update(remote_refs)
+
     return remote_has_upstream
 
 
