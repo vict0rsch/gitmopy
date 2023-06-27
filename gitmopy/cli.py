@@ -176,7 +176,9 @@ def push_cli(repo, remote):
                 done = col(f"Pushed to remote {remote.name}", "b", True)
                 set_upstream = False
                 if not remote_upstreams[remote.name]:
-                    set_upstream = set_upstream_prompt(remote.name)
+                    set_upstream = set_upstream_prompt(
+                        repo.active_branch.name, remote.name
+                    )
                     if not set_upstream:
                         print(col(f"Skipping remote {remote.name}.", "y"))
                         continue
