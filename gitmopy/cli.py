@@ -182,7 +182,7 @@ def push_cli(repo, remote):
                     if not set_upstream:
                         print(col(f"Skipping remote {remote.name}.", "y"))
                         continue
-                with console.status(wait):
+                with console.status(wait, spinner_style=COLORS["o"]):
                     # push to remote, catch exception if it fails to be able to
                     # 1. continue pushing to other remotes
                     # 2. potentially set the upstream branch
@@ -230,7 +230,7 @@ def pull_cli(repo, remote_cli_args):
             if remote.name in selected_remotes:
                 wait = col(f"Pulling from remote {remote.name}...", "o")
                 done = col(f"Pulled from remote {remote.name}", "b", True)
-                with console.status(wait):
+                with console.status(wait, spinner_style=COLORS["o"]):
                     cre = None
                     with CatchRemoteException(remote.name) as cre:
                         repo.git.pull(remote.name, repo.active_branch.name)
