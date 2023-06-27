@@ -248,8 +248,12 @@ def format_remotes_diff(repo: Repo) -> str:
                 b = repo.active_branch
                 s += col(f"remote {r.name} does not have a branch {b}\n", "y")
                 continue
-            s += col(f"local is behind {r.name} by {behind[r.name]} commit(s)\n", "o")
+            s += col(
+                f"  ↵ local is behind {r.name} by {behind[r.name]} commit(s)\n", "o"
+            )
         if ahead[r.name]:
-            s += col(f"local is ahead of {r.name} by {ahead[r.name]} commit(s)\n", "p")
+            s += col(
+                f"  ↳ local is ahead of {r.name} by {ahead[r.name]} commit(s)\n", "p"
+            )
 
     return s
