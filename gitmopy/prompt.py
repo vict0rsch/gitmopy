@@ -268,18 +268,20 @@ def choose_remote_prompt(remotes: List[str]) -> List[str]:
     return selected
 
 
-def set_upstream_prompt(remote_name: str) -> bool:
+def set_upstream_prompt(branch_name: str, remote_name: str) -> bool:
     """
     Prompt the user to set the upstream branch for a remote.
 
     Args:
+        branch_name (str): Branch name to set on the remote.
         remote_name (str): Remote name.
 
     Returns:
         bool: Whether or not to set the upstream branch.
     """
     return inquirer.confirm(
-        f"Do you want to set the upstream branch for '{remote_name}' now?",
+        f"'{remote_name}' does not have a branch named '{branch_name}'."
+        + " Create upstream branch?",
         qmark="❓",
         amark="✓",
         default=True,
