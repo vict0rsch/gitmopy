@@ -192,6 +192,8 @@ def push_cli(repo, remote):
                                 remote.name,
                                 repo.active_branch.name,
                             )
+                        if not cre.error:
+                            done += col(" (upstream branch created)", "b", True)
                     else:
                         with CatchRemoteException(remote.name) as cre:
                             repo.git.push(remote.name, repo.active_branch.name)
