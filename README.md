@@ -12,12 +12,14 @@ pip install gitmopy
 
 * I typically use `$ gitmopy commit --add --keep-alive`
 * Navigate through options with ⬆️ and ⬇️
-* Select option with **`space`**
-* Validate selection with **`enter`**
-* Press **`tab`** to auto-complete
+* **Select** option with **`space`**
+* **Validate** selection with **`enter`**
+* Press **`tab`** to **auto-complete**
   * Press `tab` on an empty line to see history
-* Restart commit with **`crtl+c`**
+* **Restart commit** with **`crtl+c`**
   * The keyboard interruption will be caught once, then press `enter` to restart
+* Push (and set upstream if need be)
+* Commit again 🔄
 
 ## Suggested shortcuts
 
@@ -86,7 +88,7 @@ $ gitmopy commit --help
 $ gitmopy info
 
 gitmopy info:
-  version : 0.3.5
+  version : 0.3.5.1
   app path: /Users/victor/.gitmopy
   history : /Users/victor/.gitmopy/history.json
   config  : /Users/victor/.gitmopy/config.yaml
