@@ -251,4 +251,4 @@ def format_remotes_diff(repo: Repo) -> str:
                 f"  ↳ local is ahead of {r.name} by {ahead[r.name]} commit(s)\n", "p"
             )
 
-    return behind, s
+    return s
