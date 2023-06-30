@@ -241,6 +241,49 @@ def terminal_separator(margin=10):
     return f"{' ' * margin}{sep}{' ' * margin}"
 
 
+def load_user_gitmojis() -> List[Dict[str, str]]:
+    """
+    Load custom gitmojis from ``${APP_PATH}/custom_gitmojis.yaml``.
+
+    Returns:
+        List[Dict[str, str]]: Custom gitmojis.
+    """
+    custom_emos = []
+    try:
+        if USER_GITMOJIS_PATH.exists():
+            custom_emos = safe_load(USER_GITMOJIS_PATH.read_text()) or []
+        else:
+            USER_GITMOJIS_PATH.write_text(
+                dedent(
+                    """\
+            # A file to add your own emojies. For instance, uncomment
+            # the following lines to add new emojis to the list of suggestions
+            # for when you commit:
+
+            # - emoji: "🧫"
+            #   description: Experimental code
+
+            # - emoji: "💪"
+            #   description: Add utility functions
+            """
+                )
+            )
+            custom_emos = []
+        validate_user_emojis(custom_emos)
+    except Exception as e:
+        print(
+            col(
+                f"Error loading custom gitmojis from {str(USER_GITMOJIS_PATH)}, ignoring.",
+                "red",
+                True,
+            )
+        )
+        print(str(e))
+        custom_emos = []
+
+    finally:
+        return custom_emos
+
 
 def validate_user_emojis(custom_emos: Any) -> List[Dict[str, str]]:
     """
