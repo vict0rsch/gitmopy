@@ -44,7 +44,7 @@ HISTORY_PATH = APP_PATH / "history.json"
 Path to the history file.
 """
 
-USER_GITMOJIS_PATH = APP_PATH / "custom_gitmojis.json"
+USER_GITMOJIS_PATH = APP_PATH / "custom_gitmojis.yaml"
 """
 Path to the user's gitmojis file.
 """
