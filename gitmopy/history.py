@@ -7,7 +7,7 @@ In particular:
 """
 import json
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import gitmopy.constants as gpyc
 from gitmopy.utils import col, load_config, load_user_gitmojis, print
@@ -28,6 +28,7 @@ def load_history() -> List[Dict[str, str]]:
             print(
                 col(f"Error loading history from {str(gpyc.HISTORY_PATH)}", "red", True)
             )
+            print(e)
             history = []
 
     gpyc.HISTORY = history

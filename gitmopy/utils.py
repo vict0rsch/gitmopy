@@ -209,7 +209,8 @@ def load_user_gitmojis() -> List[Dict[str, str]]:
     except Exception as e:
         print(
             col(
-                f"Error loading custom gitmojis from {str(USER_GITMOJIS_PATH)}, ignoring.",
+                f"Error loading custom gitmojis from {str(USER_GITMOJIS_PATH)},"
+                + " ignoring.",
                 "red",
                 True,
             )
