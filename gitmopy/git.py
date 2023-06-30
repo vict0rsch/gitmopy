@@ -6,7 +6,8 @@ from typing import Dict, List, Union
 from git import Repo, Remote
 from git.exc import GitCommandError
 
-from gitmopy.utils import _sentinels, print, col
+from gitmopy.utils import print, col
+from gitmopy.constants import _sentinels
 
 
 class CatchRemoteException:

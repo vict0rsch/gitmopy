@@ -9,9 +9,8 @@ import json
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from gitmopy.utils import GITMOJIS, HISTORY_PATH, load_config, print
-
-HISTORY = []
+from gitmopy.utils import load_config, print, load_user_gitmojis, col
+import gitmopy.constants as gpyc
 
 
 def load_history() -> List[Dict[str, str]]:
@@ -20,13 +19,18 @@ def load_history() -> List[Dict[str, str]]:
 
     Returns an empty list if the file does not exist.
     """
-    global HISTORY
     history = []
 
-    if HISTORY_PATH.exists():
-        history = json.loads(HISTORY_PATH.read_text())
+    if gpyc.HISTORY_PATH.exists():
+        try:
+            history = json.loads(gpyc.HISTORY_PATH.read_text())
+        except Exception as e:
+            print(
+                col(f"Error loading history from {str(gpyc.HISTORY_PATH)}", "red", True)
+            )
+            history = []
 
-    HISTORY = history
+    gpyc.HISTORY = history
 
 
 def timestamp() -> int:
@@ -39,9 +43,7 @@ def timestamp() -> int:
     return int(datetime.now().timestamp())
 
 
-def save_to_history(
-    commit_dict: Dict[str, str], history: Optional[List[Dict[str, str]]] = None
-) -> None:
+def save_to_history(commit_dict: Dict[str, str]) -> None:
     """
     Writes a commit dictionnary to the history file in ``${HISTORY_PATH}``.
 
@@ -52,24 +54,21 @@ def save_to_history(
         history (list, optional): History to append to. Will use the global one if
             ``None``. Defaults to ``None``.
     """
-    if history is None:
-        history = HISTORY
-    history.append(
+    gpyc.HISTORY.append(
         {
             **commit_dict,
             "timestamp": timestamp(),
         }
     )
-    if not HISTORY_PATH.parent.exists():
-        HISTORY_PATH.parent.mkdir(parents=True)
-        print("[bold green]Created history file in", str(HISTORY_PATH), end="\n\n")
+    if not gpyc.HISTORY_PATH.parent.exists():
+        gpyc.HISTORY_PATH.parent.mkdir(parents=True)
+    if not gpyc.HISTORY_PATH.exists():
+        print("[bold green]Created history file in", str(gpyc.HISTORY_PATH), end="\n\n")
 
-    HISTORY_PATH.write_text(json.dumps(history))
+    gpyc.HISTORY_PATH.write_text(json.dumps(gpyc.HISTORY))
 
 
-def sort_emojis(
-    gitmojis: List[Dict[str, str]], history: Optional[List[Dict[str, str]]] = None
-) -> List[Dict[str, str]]:
+def sort_emojis() -> List[Dict[str, str]]:
     """
     Sort emojis by most recent usage in history.
 
@@ -81,12 +80,10 @@ def sort_emojis(
     Returns:
         List[Dict[str, str]]: Sorted gitmojis.
     """
-    if history is None:
-        history = HISTORY
     dater = {}
-    for commit in history:
+    for commit in gpyc.HISTORY:
         dater[commit["emoji"]] = commit["timestamp"]
-    gitmojis.sort(key=lambda x: dater.get(x["emoji"], 0), reverse=True)
+    gpyc.GITMOJIS.sort(key=lambda x: dater.get(x["emoji"], 0), reverse=True)
 
 
 def gitmojis_setup() -> None:
@@ -98,16 +95,20 @@ def gitmojis_setup() -> None:
     * loads the history (if enabled)
     * sorts the emojis by most recent usage in history (if enabled)
     """
-    global GITMOJIS
-
     config = load_config()
+    emo_dict = {e["emoji"]: e for e in gpyc.GITMOJIS}
+    user_emojis = load_user_gitmojis()
+    for u in user_emojis:
+        emo_dict[u["emoji"]] = u
 
-    for k, e in enumerate(GITMOJIS):
-        GITMOJIS[k]["name"] = e["emoji"] + " " + e["description"]
-        GITMOJIS[k]["value"] = e["emoji"]
+    gpyc.GITMOJIS = list(emo_dict.values())
+
+    for k, e in enumerate(gpyc.GITMOJIS):
+        gpyc.GITMOJIS[k]["name"] = e["emoji"] + " " + e["description"]
+        gpyc.GITMOJIS[k]["value"] = e["emoji"]
 
     if not config["enable_history"]:
         return
 
     load_history()
-    sort_emojis(GITMOJIS)
+    sort_emojis()

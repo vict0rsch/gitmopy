@@ -11,16 +11,13 @@ from InquirerPy.base.control import Choice
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.document import Document
 
-from gitmopy import history as gmp_history
 from gitmopy.utils import (
-    APP_PATH,
-    DEFAULT_CHOICES,
-    GITMOJIS,
     load_config,
     safe_capitalize,
     save_config,
     choice_separator,
 )
+import gitmopy.constants as gpyc
 
 
 class GMPCompleter(Completer):
@@ -38,7 +35,7 @@ class GMPCompleter(Completer):
         self.key = key
         self.max_results = max_results
         self.candidates = {}
-        for c in gmp_history.HISTORY:
+        for c in gpyc.HISTORY:
             if c[key] not in self.candidates:
                 self.candidates[c[key]] = c["timestamp"]
             else:
@@ -95,7 +92,7 @@ def commit_prompt(config: Dict[str, bool]) -> Dict[str, str]:
     emoji = (
         inquirer.fuzzy(
             message="Select gitmoji:",
-            choices=GITMOJIS,
+            choices=gpyc.GITMOJIS,
             multiselect=False,
             max_height="70%",
             mandatory=True,
@@ -184,13 +181,13 @@ def config_prompt() -> None:
 
     choices = [
         Choice(c["value"], c["name"], config.get(c["value"], c["default"]))
-        for c in DEFAULT_CHOICES
+        for c in gpyc.DEFAULT_CHOICES
     ]
 
     selected = inquirer.checkbox(
         message="Configure gitmopy locally.",
         instruction="Use 'space' to (de-)select, 'enter' to validate.",
-        long_instruction=f"Config will be saved in {str(APP_PATH)}/config.yaml.",
+        long_instruction=f"Config will be saved in {str(gpyc.APP_PATH)}/config.yaml.",
         choices=choices,
         cycle=True,
         transformer=lambda result: "",

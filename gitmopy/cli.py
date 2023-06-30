@@ -23,12 +23,14 @@ from gitmopy.prompt import (
     set_upstream_prompt,
     what_now_prompt,
 )
-from gitmopy.utils import (
+from gitmopy.constants import (
     APP_PATH,
     CONFIG_PATH,
     HISTORY_PATH,
     COLORS,
     _sentinels,
+)
+from gitmopy.utils import (
     col,
     console,
     load_config,
@@ -71,6 +73,9 @@ def catch_keyboard_interrupt(func, *args, **kwargs):
         return_value = _sentinels["cancelled"]
         try:
             return_value = func(*_args, **_kwargs)
+        except Exception as e:
+            if not isinstance(e, KeyboardInterrupt):
+                print(e)
         finally:
             return return_value
 
