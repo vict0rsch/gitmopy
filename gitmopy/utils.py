@@ -192,9 +192,10 @@ def load_user_gitmojis() -> List[Dict[str, str]]:
             USER_GITMOJIS_PATH.write_text(
                 dedent(
                     """\
-            # A file to add your own emojies. For instance, uncomment
-            # the following lines to add new emojis to the list of suggestions
-            # for when you commit:
+            # A file to add your own emojies.
+
+            # For instance, uncomment the following lines to add new emojis
+            # to the list of suggestions for when you commit:
 
             # - emoji: "🧫"
             #   description: Experimental code
