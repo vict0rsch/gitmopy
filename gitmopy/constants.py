@@ -1,3 +1,6 @@
+"""
+Constants for gitmopy.
+"""
 from os.path import expandvars
 from pathlib import Path
 

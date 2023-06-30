@@ -85,7 +85,6 @@ def has_upstreams(
         Dict[str, bool]: Dictionnary of booleans indicating if each remote has the
             branch.
     """
-
     fetch_all(repo)
     remote_has_upstream = {
         r.name if isinstance(r, Remote) else r: False for r in remotes

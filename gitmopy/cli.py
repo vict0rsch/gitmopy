@@ -141,19 +141,29 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
     return commit_again
 
 
-def push_cli(repo, remote):
-    # push to remotes. If several remotes, use either the values from --remote
-    # or prompt the user to choose them.
-    # If no remote, ignore push.
+def push_cli(repo, remote_cli_args):
+    """
+    Push to user remotes.
+
+    If several remotes, use either the values from --remote or prompt the user to
+    select them.
+
+    Args:
+        repo (Repo): The git repository.
+        remote_cli_args (List[str]): The remotes passed as CLI arguments.
+
+    Raises:
+        typer.Abort: If no remote is selected.
+    """
     if len(repo.remotes) == 0:
         print(col("No remote found. Ignoring push.", "y"))
     else:
         # default: contain "origin"
         selected_remotes = set([repo.remotes[0].name])
         if len(repo.remotes) > 1:
-            if remote:
+            if remote_cli_args:
                 # use --remote values
-                selected_remotes = set(remote)
+                selected_remotes = set(remote_cli_args)
             else:
                 # PROMPT: choose remote
                 selected_remotes = choose_remote_prompt(repo.remotes)
@@ -202,10 +212,20 @@ def push_cli(repo, remote):
                         print(done)
 
 
-def pull_cli(repo, remote_cli_args):
-    # pull from remotes. If several remotes, use either the values from --remote
-    # or prompt the user to choose them.
-    # If no remote, ignore push.
+def pull_cli(repo: Repo, remote_cli_args: List[str]):
+    """
+    Pull from remotes.
+
+    If several remotes, use either the values from --remote, or prompt the user
+    to choose them.
+
+    Args:
+        repo (git.Repo): The git repository.
+        remote_cli_args (List[str]): The remotes passed as CLI arguments.
+
+    Raises:
+        typer.Abort: Stops the process if the users does not choose a remote.
+    """
     if len(repo.remotes) == 0:
         print(col("No remote found. Ignoring pull.", "y"))
     else:
@@ -220,7 +240,7 @@ def pull_cli(repo, remote_cli_args):
             if not selected_remotes:
                 # stop if no remote selected
                 print(col("No remote selected. Aborting.", "y"))
-                raise typer.Exit(1)
+                raise typer.Abort()
             selected_remotes = set(selected_remotes)
         print()
 

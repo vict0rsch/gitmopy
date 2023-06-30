@@ -282,8 +282,9 @@ def set_upstream_prompt(branch_name: str, remote_name: str) -> bool:
 
 def what_now_prompt(choices: Dict[str, str]) -> str:
     """
-    Prompt the user to select what to do next. Choices must be a
-    dict like `{value: name}`
+    Prompt the user to select what to do next.
+
+    Choices must be a dictlike `{value: name}`.
 
     Args:
         choices (Dict[str, str]): Available choices.
