@@ -8,7 +8,14 @@ import typer
 from git import Repo
 from typing_extensions import Annotated
 
-from gitmopy.constants import APP_PATH, COLORS, CONFIG_PATH, HISTORY_PATH, _sentinels
+from gitmopy.constants import (
+    APP_PATH,
+    COLORS,
+    CONFIG_PATH,
+    HISTORY_PATH,
+    USER_GITMOJIS_PATH,
+    _sentinels,
+)
 from gitmopy.git import (
     CatchRemoteException,
     format_remotes_diff,
@@ -452,12 +459,12 @@ def info():
     import gitmopy
 
     print("\n[b u green3]gitmopy info:[/b u green3]")
-    print("  version :", gitmopy.__version__)
-    print("  app path:", str(APP_PATH))
+    print("  version      :", gitmopy.__version__)
+    print("  app path     :", str(APP_PATH))
     if HISTORY_PATH.exists():
-        print("  history :", str(HISTORY_PATH))
-    if CONFIG_PATH:
-        print("  config  :", str(CONFIG_PATH))
+        print("  history      :", str(HISTORY_PATH))
+    print("  config       :", str(CONFIG_PATH))
+    print("  custom emojis:", str(USER_GITMOJIS_PATH))
     config = load_config()
     print(f"\n[u]{col('Current configuration:', 'b', True)}[/u]")
     max_l = max([len(k) for k in config.keys()])
