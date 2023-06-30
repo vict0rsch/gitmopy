@@ -11,7 +11,7 @@ from InquirerPy.separator import Separator
 from rich.console import Console
 from yaml import safe_dump, safe_load
 
-from gitmopy.constants import APP_PATH, COLORS, DEFAULT_CONFIG, USER_GITMOJIS_PATH
+from gitmopy.constants import APP_PATH, COLORS, DEFAULT_CONFIG, USER_EMOJIS_PATH
 
 console = Console()
 print = console.print
@@ -186,10 +186,10 @@ def load_user_gitmojis() -> List[Dict[str, str]]:
     """
     custom_emos = []
     try:
-        if USER_GITMOJIS_PATH.exists():
-            custom_emos = safe_load(USER_GITMOJIS_PATH.read_text()) or []
+        if USER_EMOJIS_PATH.exists():
+            custom_emos = safe_load(USER_EMOJIS_PATH.read_text()) or []
         else:
-            USER_GITMOJIS_PATH.write_text(
+            USER_EMOJIS_PATH.write_text(
                 dedent(
                     """\
             # A file to add your own emojies.
@@ -210,7 +210,7 @@ def load_user_gitmojis() -> List[Dict[str, str]]:
     except Exception as e:
         print(
             col(
-                f"Error loading custom gitmojis from {str(USER_GITMOJIS_PATH)},"
+                f"Error loading custom gitmojis from {str(USER_EMOJIS_PATH)},"
                 + " ignoring.",
                 "red",
                 True,

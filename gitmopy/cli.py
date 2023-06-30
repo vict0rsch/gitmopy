@@ -13,7 +13,7 @@ from gitmopy.constants import (
     COLORS,
     CONFIG_PATH,
     HISTORY_PATH,
-    USER_GITMOJIS_PATH,
+    USER_EMOJIS_PATH,
     _sentinels,
 )
 from gitmopy.git import (
@@ -464,7 +464,7 @@ def info():
     if HISTORY_PATH.exists():
         print("  history      :", str(HISTORY_PATH))
     print("  config       :", str(CONFIG_PATH))
-    print("  custom emojis:", str(USER_GITMOJIS_PATH))
+    print("  custom emojis:", str(USER_EMOJIS_PATH))
     config = load_config()
     print(f"\n[u]{col('Current configuration:', 'b', True)}[/u]")
     max_l = max([len(k) for k in config.keys()])
