@@ -21,6 +21,8 @@ pip install gitmopy
 * Push (and set upstream if need be)
 * Commit again 🔄
 
+Use your own emojis by editing the "custom emojis" file listed by `gitmopy info`!
+
 ## Suggested shortcuts
 
 ```bash
@@ -88,10 +90,11 @@ $ gitmopy commit --help
 $ gitmopy info
 
 gitmopy info:
-  version : 0.3.5.2
-  app path: /Users/victor/.gitmopy
-  history : /Users/victor/.gitmopy/history.json
-  config  : /Users/victor/.gitmopy/config.yaml
+  version      : 0.4.0
+  app path     : /Users/victor/.gitmopy
+  history      : /Users/victor/.gitmopy/history.json
+  config       : /Users/victor/.gitmopy/config.yaml
+  custom emojis: /Users/victor/.gitmopy/custom_gitmojis.yaml
 
 Current configuration:
   skip_scope      : False
