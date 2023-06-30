@@ -3,10 +3,11 @@
 """
 from typing import Dict, List, Union
 
-from git import Repo, Remote
+from git import Remote, Repo
 from git.exc import GitCommandError
 
-from gitmopy.utils import _sentinels, print, col
+from gitmopy.constants import _sentinels
+from gitmopy.utils import col, print
 
 
 class CatchRemoteException:
@@ -84,7 +85,6 @@ def has_upstreams(
         Dict[str, bool]: Dictionnary of booleans indicating if each remote has the
             branch.
     """
-
     fetch_all(repo)
     remote_has_upstream = {
         r.name if isinstance(r, Remote) else r: False for r in remotes

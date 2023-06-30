@@ -8,6 +8,14 @@ import typer
 from git import Repo
 from typing_extensions import Annotated
 
+from gitmopy.constants import (
+    APP_PATH,
+    COLORS,
+    CONFIG_PATH,
+    HISTORY_PATH,
+    USER_EMOJIS_PATH,
+    _sentinels,
+)
 from gitmopy.git import (
     CatchRemoteException,
     format_remotes_diff,
@@ -24,11 +32,6 @@ from gitmopy.prompt import (
     what_now_prompt,
 )
 from gitmopy.utils import (
-    APP_PATH,
-    CONFIG_PATH,
-    HISTORY_PATH,
-    COLORS,
-    _sentinels,
     col,
     console,
     load_config,
@@ -71,6 +74,9 @@ def catch_keyboard_interrupt(func, *args, **kwargs):
         return_value = _sentinels["cancelled"]
         try:
             return_value = func(*_args, **_kwargs)
+        except Exception as e:
+            if not isinstance(e, KeyboardInterrupt):
+                print(e)
         finally:
             return return_value
 
@@ -142,19 +148,29 @@ def should_commit_again(repo: Repo, remote: List[str]) -> bool:
     return commit_again
 
 
-def push_cli(repo, remote):
-    # push to remotes. If several remotes, use either the values from --remote
-    # or prompt the user to choose them.
-    # If no remote, ignore push.
+def push_cli(repo, remote_cli_args):
+    """
+    Push to user remotes.
+
+    If several remotes, use either the values from --remote or prompt the user to
+    select them.
+
+    Args:
+        repo (Repo): The git repository.
+        remote_cli_args (List[str]): The remotes passed as CLI arguments.
+
+    Raises:
+        typer.Abort: If no remote is selected.
+    """
     if len(repo.remotes) == 0:
         print(col("No remote found. Ignoring push.", "y"))
     else:
         # default: contain "origin"
         selected_remotes = set([repo.remotes[0].name])
         if len(repo.remotes) > 1:
-            if remote:
+            if remote_cli_args:
                 # use --remote values
-                selected_remotes = set(remote)
+                selected_remotes = set(remote_cli_args)
             else:
                 # PROMPT: choose remote
                 selected_remotes = choose_remote_prompt(repo.remotes)
@@ -203,10 +219,20 @@ def push_cli(repo, remote):
                         print(done)
 
 
-def pull_cli(repo, remote_cli_args):
-    # pull from remotes. If several remotes, use either the values from --remote
-    # or prompt the user to choose them.
-    # If no remote, ignore push.
+def pull_cli(repo: Repo, remote_cli_args: List[str]):
+    """
+    Pull from remotes.
+
+    If several remotes, use either the values from --remote, or prompt the user
+    to choose them.
+
+    Args:
+        repo (git.Repo): The git repository.
+        remote_cli_args (List[str]): The remotes passed as CLI arguments.
+
+    Raises:
+        typer.Abort: Stops the process if the users does not choose a remote.
+    """
     if len(repo.remotes) == 0:
         print(col("No remote found. Ignoring pull.", "y"))
     else:
@@ -221,7 +247,7 @@ def pull_cli(repo, remote_cli_args):
             if not selected_remotes:
                 # stop if no remote selected
                 print(col("No remote selected. Aborting.", "y"))
-                raise typer.Exit(1)
+                raise typer.Abort()
             selected_remotes = set(selected_remotes)
         print()
 
@@ -433,12 +459,12 @@ def info():
     import gitmopy
 
     print("\n[b u green3]gitmopy info:[/b u green3]")
-    print("  version :", gitmopy.__version__)
-    print("  app path:", str(APP_PATH))
+    print("  version      :", gitmopy.__version__)
+    print("  app path     :", str(APP_PATH))
     if HISTORY_PATH.exists():
-        print("  history :", str(HISTORY_PATH))
-    if CONFIG_PATH:
-        print("  config  :", str(CONFIG_PATH))
+        print("  history      :", str(HISTORY_PATH))
+    print("  config       :", str(CONFIG_PATH))
+    print("  custom emojis:", str(USER_EMOJIS_PATH))
     config = load_config()
     print(f"\n[u]{col('Current configuration:', 'b', True)}[/u]")
     max_l = max([len(k) for k in config.keys()])

@@ -1,6 +1,6 @@
 # `gitmopy`
 
-An interactive Python implementation of the Gitmoji standard: https://gitmoji.dev/
+An interactive Python implementation of the Gitmoji convention: [gitmoji.dev/](https://gitmoji.dev/)
 
 ```text
 pip install gitmopy
@@ -20,6 +20,8 @@ pip install gitmopy
   * The keyboard interruption will be caught once, then press `enter` to restart
 * Push (and set upstream if need be)
 * Commit again 🔄
+
+Use your own emojis by editing the "custom emojis" file listed by `gitmopy info`!
 
 ## Suggested shortcuts
 
@@ -88,10 +90,11 @@ $ gitmopy commit --help
 $ gitmopy info
 
 gitmopy info:
-  version : 0.3.5.2
-  app path: /Users/victor/.gitmopy
-  history : /Users/victor/.gitmopy/history.json
-  config  : /Users/victor/.gitmopy/config.yaml
+  version      : 0.4.0
+  app path     : /Users/victor/.gitmopy
+  history      : /Users/victor/.gitmopy/history.json
+  config       : /Users/victor/.gitmopy/config.yaml
+  custom emojis: /Users/victor/.gitmopy/custom_gitmojis.yaml
 
 Current configuration:
   skip_scope      : False
@@ -173,7 +176,7 @@ $ gitmopy commit --help
     * `git commit` flags (like `-S`)
     * max history length (if loading the json becomes slow)
 * Tests
-  * https://typer.tiangolo.com/tutorial/testing/
+  * [typer.tiangolo.com/tutorial/testing/](https://typer.tiangolo.com/tutorial/testing/)
   * 👋 **Help wanted**
 * Docs
   * Not critical
