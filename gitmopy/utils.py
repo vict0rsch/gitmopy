@@ -4,7 +4,8 @@ Utility functions and constants for ``gitmopy``.
 from os.path import expandvars
 from pathlib import Path
 from shutil import get_terminal_size
-from typing import Dict, List, Union
+from textwrap import dedent
+from typing import Dict, List, Union, Any
 
 import typer
 from InquirerPy.separator import Separator
@@ -41,6 +42,11 @@ Path to the configuration file.
 HISTORY_PATH = APP_PATH / "history.json"
 """
 Path to the history file.
+"""
+
+USER_GITMOJIS_PATH = APP_PATH / "custom_gitmojis.json"
+"""
+Path to the user's gitmojis file.
 """
 
 COLORS = {
