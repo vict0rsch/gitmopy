@@ -1,6 +1,6 @@
 # `gitmopy`
 
-An interactive Python implementation of the Gitmoji standard: https://gitmoji.dev/
+An interactive Python implementation of the Gitmoji convention: [gitmoji.dev/](https://gitmoji.dev/)
 
 ```text
 pip install gitmopy
@@ -173,7 +173,7 @@ $ gitmopy commit --help
     * `git commit` flags (like `-S`)
     * max history length (if loading the json becomes slow)
 * Tests
-  * https://typer.tiangolo.com/tutorial/testing/
+  * [typer.tiangolo.com/tutorial/testing/](https://typer.tiangolo.com/tutorial/testing/)
   * 👋 **Help wanted**
 * Docs
   * Not critical

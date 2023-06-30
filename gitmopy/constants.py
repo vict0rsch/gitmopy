@@ -1,6 +1,7 @@
-from pathlib import Path
-import typer
 from os.path import expandvars
+from pathlib import Path
+
+import typer
 
 APP_PATH = (
     Path(expandvars(typer.get_app_dir("gitmopy", force_posix=True)))

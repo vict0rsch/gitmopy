@@ -9,8 +9,8 @@ import json
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from gitmopy.utils import load_config, print, load_user_gitmojis, col
 import gitmopy.constants as gpyc
+from gitmopy.utils import col, load_config, load_user_gitmojis, print
 
 
 def load_history() -> List[Dict[str, str]]:

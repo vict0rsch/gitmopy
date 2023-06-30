@@ -11,13 +11,8 @@ from InquirerPy.base.control import Choice
 from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.document import Document
 
-from gitmopy.utils import (
-    load_config,
-    safe_capitalize,
-    save_config,
-    choice_separator,
-)
 import gitmopy.constants as gpyc
+from gitmopy.utils import choice_separator, load_config, safe_capitalize, save_config
 
 
 class GMPCompleter(Completer):

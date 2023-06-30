@@ -8,6 +8,7 @@ import typer
 from git import Repo
 from typing_extensions import Annotated
 
+from gitmopy.constants import APP_PATH, COLORS, CONFIG_PATH, HISTORY_PATH, _sentinels
 from gitmopy.git import (
     CatchRemoteException,
     format_remotes_diff,
@@ -22,13 +23,6 @@ from gitmopy.prompt import (
     git_add_prompt,
     set_upstream_prompt,
     what_now_prompt,
-)
-from gitmopy.constants import (
-    APP_PATH,
-    CONFIG_PATH,
-    HISTORY_PATH,
-    COLORS,
-    _sentinels,
 )
 from gitmopy.utils import (
     col,

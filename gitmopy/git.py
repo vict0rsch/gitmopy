@@ -3,11 +3,11 @@
 """
 from typing import Dict, List, Union
 
-from git import Repo, Remote
+from git import Remote, Repo
 from git.exc import GitCommandError
 
-from gitmopy.utils import print, col
 from gitmopy.constants import _sentinels
+from gitmopy.utils import col, print
 
 
 class CatchRemoteException:

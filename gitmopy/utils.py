@@ -5,13 +5,13 @@ from os.path import expandvars
 from pathlib import Path
 from shutil import get_terminal_size
 from textwrap import dedent
-from typing import Dict, List, Union, Any
+from typing import Any, Dict, List, Union
 
 from InquirerPy.separator import Separator
 from rich.console import Console
 from yaml import safe_dump, safe_load
 
-from gitmopy.constants import COLORS, DEFAULT_CONFIG, USER_GITMOJIS_PATH, APP_PATH
+from gitmopy.constants import APP_PATH, COLORS, DEFAULT_CONFIG, USER_GITMOJIS_PATH
 
 console = Console()
 print = console.print
