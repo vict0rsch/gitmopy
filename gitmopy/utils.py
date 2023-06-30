@@ -241,6 +241,47 @@ def terminal_separator(margin=10):
     return f"{' ' * margin}{sep}{' ' * margin}"
 
 
+
+def validate_user_emojis(custom_emos: Any) -> List[Dict[str, str]]:
+    """
+    Validate user emojis.
+
+    * Must be a list of dictionaries (possibly empty)
+    * Each dictionary must have an ``emoji`` key and a ``description`` key
+    * Each key must be a string
+    * Each key must be non-empty
+
+    Raises:
+        ValueError: If any of the above conditions are not met.
+
+    args:
+        custom_emos (Any): User defined emojis.
+
+    Returns:
+        List[Dict[str, str]]: Validated emojis.
+    """
+    if not isinstance(custom_emos, list):
+        raise ValueError("Custom gitmojis must be a list")
+
+    for gitmoji in custom_emos:
+        if not isinstance(gitmoji, dict):
+            raise ValueError("Custom gitmojis must be a list of dictionaries")
+        if "emoji" not in gitmoji:
+            raise ValueError("Custom gitmojis must have an 'emoji' key")
+        if "description" not in gitmoji:
+            raise ValueError("Custom gitmojis must have a 'description' key")
+        if not isinstance(gitmoji["emoji"], str):
+            raise ValueError("Custom gitmojis must have a [b]string[b] 'emoji' key")
+        if not isinstance(gitmoji["description"], str):
+            raise ValueError(
+                "Custom gitmojis must have a [b]string[b] 'description' key"
+            )
+        if not gitmoji["emoji"]:
+            raise ValueError("Custom gitmojis must have a non-empty 'emoji' key")
+        if not gitmoji["description"]:
+            raise ValueError("Custom gitmojis must have a non-empty 'description' key")
+
+
 # https://github.com/carloscuesta/gitmoji/blob/master/packages/gitmojis/src/gitmojis.json
 GITMOJIS = [
     {
