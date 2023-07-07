@@ -360,7 +360,7 @@ def commit(
             if not status["staged"] and not add:
                 print(
                     col(
-                        +"\nNo staged files. Stage files yourself or use [b]--add[/b]"
+                        "\nNo staged files. Stage files yourself or use [b]--add[/b]"
                         + " to add all unstaged files.\n",
                         "y",
                     )
