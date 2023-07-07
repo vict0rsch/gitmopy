@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gitmopy"
-version = "0.4.0"
+version = "0.4.1"
 description = "A python command-line for gitmoji"
 authors = ["vict0rsch <vsch@pm.me>"]
 license = "MIT"

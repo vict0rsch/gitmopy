@@ -90,7 +90,7 @@ $ gitmopy commit --help
 $ gitmopy info
 
 gitmopy info:
-  version      : 0.4.0
+  version      : 0.4.1
   app path     : /Users/victor/.gitmopy
   history      : /Users/victor/.gitmopy/history.json
   config       : /Users/victor/.gitmopy/config.yaml
