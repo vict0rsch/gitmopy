@@ -87,7 +87,7 @@ def commit_prompt(config: Dict[str, bool]) -> Dict[str, str]:
     emoji = (
         inquirer.fuzzy(
             message="Select gitmoji:",
-            choices=gpyc.GITMOJIS,
+            choices=gpyc.EMOJIS,
             multiselect=False,
             max_height="70%",
             mandatory=True,

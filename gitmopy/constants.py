@@ -93,6 +93,13 @@ User's commit history. Will be loaded from ``${APP_PATH}/history.json``.
 Empty by default or if user diabled it.
 """
 
+EMOJIS = []
+"""
+The loaded emojis. Will be set to :py:const:`gitmopy.GITMOJIS` or
+:py:const:`gitmopy.AI_DEVMOJIS` depending on the user's choice, and updated with the
+user's custom emoji set.
+"""
+
 # https://github.com/carloscuesta/gitmoji/blob/master/packages/gitmojis/src/gitmojis.json
 GITMOJIS = [
     {
@@ -344,7 +351,7 @@ GITMOJIS = [
         "description": "Work on code related to authorization, roles and permissions.",
     },
     {
-        "emoji": "🩹",
+        "emoji": "🖍️🩹",
         "description": "Simple fix for a non-critical issue.",
     },
     {
@@ -364,7 +371,7 @@ GITMOJIS = [
         "description": "Add or update business logic.",
     },
     {
-        "emoji": "🩺",
+        "emoji": "🩺⛑️",
         "description": "Add or update healthcheck.",
     },
     {
@@ -384,11 +391,218 @@ GITMOJIS = [
         "description": "Add or update code related to multithreading or concurrency.",
     },
     {
-        "emoji": "🦺",
+        "emoji": "✅🦺",
         "description": "Add or update code related to validation.",
     },
 ]
 """
 List of emojis and their code and description according
 to https://gitmoji.dev/
+"""
+
+AI_DEVMOJIS = [
+    {
+        "emoji": "🧠",
+        "description": "Add or update a model.",
+    },
+    {
+        "emoji": "🧬",
+        "description": "Add or update a dataset.",
+    },
+    {
+        "emoji": "🧮",
+        "description": "Add or update a metric.",
+    },
+    {
+        "emoji": "🧩",
+        "description": "Add or update a loss function.",
+    },
+    {
+        "emoji": "🧱",
+        "description": "Add or update a layer.",
+    },
+    {
+        "emoji": "🔢",
+        "description": "Add or update a numerical algorithm.",
+    },
+    {
+        "emoji": "📉",
+        "description": "Add or update a statistical algorithm.",
+    },
+    {
+        "emoji": "🔊",
+        "description": "Update logging.",
+    },
+    {
+        "emoji": "🎲",
+        "description": "Add or update code related to randomness.",
+    },
+    {
+        "emoji": "🧪",
+        "description": "Update experiments pipeline.",
+    },
+    {
+        "emoji": "📊",
+        "description": "Add or update data visualization.",
+    },
+    {
+        "emoji": "📋",
+        "description": "Add or update data processing pipeline.",
+    },
+    {
+        "emoji": "📄",
+        "description": "Add or update documentation.",
+    },
+    {
+        "emoji": "🧾",
+        "description": "Add or update paper.",
+    },
+    {
+        "emoji": "🔨",
+        "description": "Add or update development scripts.",
+    },
+    {
+        "emoji": "🔧",
+        "description": "Add or update utility functions.",
+    },
+    {
+        "description": "Improve function logic.",
+        "emoji": "🏄‍♂️",
+    },
+    {
+        "emoji": "🐛",
+        "description": "Fix a bug.",
+    },
+    {
+        "emoji": "🚑",
+        "description": "Critical hotfix.",
+    },
+    {
+        "emoji": "🚀",
+        "description": "Deploy stuff.",
+    },
+    {
+        "emoji": "📦",
+        "description": "Add or update compiled files or packages.",
+    },
+    {
+        "emoji": "🔧",
+        "description": "Add or update configuration files.",
+    },
+    {
+        "emoji": "👥",
+        "description": "Add or update contributor(s).",
+    },
+    {
+        "emoji": "🔍",
+        "description": "Add or update data exploration.",
+    },
+    {
+        "emoji": "🧵",
+        "description": "Add or update code related to multithreading or concurrency.",
+    },
+    {
+        "emoji": "🧑‍💻",
+        "description": "Improve developer experience.",
+    },
+    {
+        "emoji": "🩺⛑️",
+        "description": "Add or update healthcheck.",
+    },
+    {
+        "emoji": "🧪",
+        "description": "Work on a test.",
+    },
+    {
+        "emoji": "🖍️🩹",
+        "description": "Simple fix for a non-critical issue.",
+    },
+    {
+        "emoji": "🚩",
+        "description": "Add, update, or remove flags / command-line arguments.",
+    },
+    {
+        "emoji": "🥅",
+        "description": "Catch errors.",
+    },
+    {
+        "emoji": "🏷️",
+        "description": "Add or update types.",
+    },
+    {
+        "emoji": "🙈",
+        "description": "Add or update a .gitignore file.",
+    },
+    {
+        "emoji": "🚸",
+        "description": "Improve user experience / usability.",
+    },
+    {
+        "emoji": "🏗️",
+        "description": "Make architectural changes.",
+    },
+    {
+        "emoji": "💡",
+        "description": "Add or update comments in source code.",
+    },
+    {
+        "emoji": "🍻",
+        "description": "Write code drunkenly.",
+    },
+    {
+        "emoji": "👽️",
+        "description": "Update code due to external API changes.",
+    },
+    {
+        "emoji": "🚚",
+        "description": "Move or rename resources (e.g.: files, paths, routes).",
+    },
+    {
+        "emoji": "📄",
+        "description": "Add or update license.",
+    },
+    {
+        "emoji": "💥",
+        "description": "Introduce breaking changes.",
+    },
+    {
+        "emoji": "🍱",
+        "description": "Add or update assets, constants etc.",
+    },
+    {
+        "emoji": "✏️",
+        "description": "Fix typos.",
+    },
+    {
+        "emoji": "💩",
+        "description": "Write bad code that needs to be improved.",
+    },
+    {
+        "emoji": "⏪️",
+        "description": "Revert changes.",
+    },
+    {
+        "emoji": "♻️",
+        "description": "Refactor code.",
+    },
+    {
+        "emoji": "🎨",
+        "description": "Improve structure / format of the code.",
+    },
+    {
+        "emoji": "⚡️",
+        "description": "Improve performance.",
+    },
+    {
+        "emoji": "🔥",
+        "description": "Remove code or files.",
+    },
+    {
+        "emoji": "✨",
+        "description": "Introduce new features.",
+    },
+]
+"""
+List of emojis and their code and description according to a new standard
+tailored for AI/ML projects and development.
 """
