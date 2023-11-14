@@ -21,7 +21,11 @@ pip install gitmopy
 * Push (and set upstream if need be)
 * Commit again 🔄
 
+You can also select another set of default emojis tailored towards AI/ML development by running `gitmopy config` then pressing `Enter` and choosing `ai-devmojis` as the config option.
+
 Use your own emojis by editing the "custom emojis" file listed by `gitmopy info`!
+
+[**See all available emojis**](https://gitmopy.readthedocs.io/en/latest/emoji_sets.html)
 
 ## Suggested shortcuts
 
