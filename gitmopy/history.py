@@ -69,7 +69,7 @@ def save_to_history(commit_dict: Dict[str, str]) -> None:
     gpyc.HISTORY_PATH.write_text(json.dumps(gpyc.HISTORY))
 
 
-def sort_emojis() -> List[Dict[str, str]]:
+def sort_emojis_by_timestamp() -> List[Dict[str, str]]:
     """
     Sort emojis by most recent usage in history.
 
@@ -114,4 +114,4 @@ def gitmojis_setup() -> None:
         return
 
     load_history()
-    sort_emojis()
+    sort_emojis_by_timestamp()
