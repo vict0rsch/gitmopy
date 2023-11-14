@@ -6,4 +6,5 @@
    :maxdepth: 4
 
    self
+   emoji_sets
 
