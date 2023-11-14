@@ -5,19 +5,22 @@
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-
-project = 'gitmopy'
-copyright = '2023, vict0rsch'
-author = 'vict0rsch'
-
-version = '0.4.1'
-release = '0.4.1'
-
 import sys
 from pathlib import Path
 
+project = "gitmopy"
+copyright = "2023, vict0rsch"
+author = "vict0rsch"
+
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
+
+version = [
+    line.split("=")[-1].strip().replace('"', "")
+    for line in (ROOT / "pyproject.toml").read_text().splitlines()
+    if line.startswith("version = ")
+][0]
+release = version
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -39,23 +42,22 @@ extensions = [
 ]
 
 
-templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "furo"
-html_static_path = ['_static']
+html_static_path = ["_static"]
 html_css_files = ["css/custom.css"]
 
 # -- Options for intersphinx extension ---------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html#configuration
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3', None),
+    "python": ("https://docs.python.org/3", None),
 }
 
 # -- Options for todo extension ----------------------------------------------
@@ -72,7 +74,7 @@ todo_include_todos = True
 
 autodoc_typehints = "description"
 autoapi_type = "python"
-autoapi_dirs = [str(ROOT/ "gitmopy")]
+autoapi_dirs = [str(ROOT / "gitmopy")]
 autoapi_member_order = "groupwise"
 autoapi_template_dir = "_templates/autoapi"
 autoapi_python_class_content = "init"
@@ -119,4 +121,3 @@ ogp_social_cards = {
     "enable": True,
     "image": "./_static/images/SOME_IMAGE",
 }
-
