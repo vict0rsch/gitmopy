@@ -70,6 +70,12 @@ DEFAULT_CHOICES = [
         "name": "Remember commit history for auto-complete and emoji sorting",
         "default": True,
     },
+    {
+        "value": "emoji_set",
+        "name": "Emoji set to use for commits",
+        "default": "gitmoji",
+        "options": ["gitmoji", "ai-devmojis", "custom"],
+    },
 ]
 """
 Choices for the setup prompt.
