@@ -98,7 +98,9 @@ def gitmojis_setup() -> None:
     """
     config = load_config()
     emo_dict = {e["emoji"]: e for e in gpyc.GITMOJIS}
-    user_emojis = load_user_gitmojis()
+    user_emojis = []
+    if config["emoji_set"] == "custom":
+        user_emojis = load_user_gitmojis()
     for u in user_emojis:
         emo_dict[u["emoji"]] = u
 
