@@ -69,7 +69,7 @@ def save_to_history(commit_dict: Dict[str, str]) -> None:
     gpyc.HISTORY_PATH.write_text(json.dumps(gpyc.HISTORY))
 
 
-def sort_emojis() -> List[Dict[str, str]]:
+def sort_emojis_by_timestamp() -> List[Dict[str, str]]:
     """
     Sort emojis by most recent usage in history.
 
@@ -84,7 +84,7 @@ def sort_emojis() -> List[Dict[str, str]]:
     dater = {}
     for commit in gpyc.HISTORY:
         dater[commit["emoji"]] = commit["timestamp"]
-    gpyc.GITMOJIS.sort(key=lambda x: dater.get(x["emoji"], 0), reverse=True)
+    gpyc.EMOJIS.sort(key=lambda x: dater.get(x["emoji"], 0), reverse=True)
 
 
 def gitmojis_setup() -> None:
@@ -97,19 +97,22 @@ def gitmojis_setup() -> None:
     * sorts the emojis by most recent usage in history (if enabled)
     """
     config = load_config()
-    emo_dict = {e["emoji"]: e for e in gpyc.GITMOJIS}
+    if config["emoji_set"].lower() == "gitmoji":
+        emo_dict = {e["emoji"]: e for e in gpyc.GITMOJIS}
+    else:
+        emo_dict = {e["emoji"]: e for e in gpyc.AI_DEVMOJIS}
     user_emojis = load_user_gitmojis()
     for u in user_emojis:
         emo_dict[u["emoji"]] = u
 
-    gpyc.GITMOJIS = list(emo_dict.values())
+    gpyc.EMOJIS = list(emo_dict.values())
 
-    for k, e in enumerate(gpyc.GITMOJIS):
-        gpyc.GITMOJIS[k]["name"] = e["emoji"] + " " + e["description"]
-        gpyc.GITMOJIS[k]["value"] = e["emoji"]
+    for k, e in enumerate(gpyc.EMOJIS):
+        gpyc.EMOJIS[k]["name"] = e["emoji"] + " " + e["description"]
+        gpyc.EMOJIS[k]["value"] = e["emoji"]
 
     if not config["enable_history"]:
         return
 
     load_history()
-    sort_emojis()
+    sort_emojis_by_timestamp()

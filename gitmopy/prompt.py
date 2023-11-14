@@ -87,7 +87,7 @@ def commit_prompt(config: Dict[str, bool]) -> Dict[str, str]:
     emoji = (
         inquirer.fuzzy(
             message="Select gitmoji:",
-            choices=gpyc.GITMOJIS,
+            choices=gpyc.EMOJIS,
             multiselect=False,
             max_height="70%",
             mandatory=True,
@@ -177,6 +177,7 @@ def config_prompt() -> None:
     choices = [
         Choice(c["value"], c["name"], config.get(c["value"], c["default"]))
         for c in gpyc.DEFAULT_CHOICES
+        if isinstance(c["default"], bool)
     ]
 
     selected = inquirer.checkbox(
@@ -192,8 +193,26 @@ def config_prompt() -> None:
 
     selected = set(selected)
 
+    lists = [
+        c
+        for c in gpyc.DEFAULT_CHOICES
+        if isinstance(c["default"], str) and "options" in c
+    ]
+    options = {}
+
+    for ldict in lists:
+        option = inquirer.select(
+            message=ldict["name"],
+            choices=ldict["options"],
+            default=ldict["default"],
+            qmark="❓",
+            amark="✓",
+        ).execute()
+        options[ldict["value"]] = option
+
     for c in choices:
         config[c.value] = c.value in selected
+    config.update(options)
 
     save_config(config)
 
