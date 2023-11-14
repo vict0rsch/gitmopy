@@ -6,7 +6,7 @@ An interactive Python implementation of the Gitmoji convention: [gitmoji.dev/](h
 pip install gitmopy
 ```
 
-![demo-gitmopy](./assets/demo-gitmopy.gif)
+![demo-gitmopy](https://raw.githubusercontent.com/vict0rsch/gitmopy/main/assets/demo-gitmopy.gif)
 
 ## How to use
 
@@ -32,7 +32,7 @@ alias gpya="gitmopy commit --add"
 alias gpyk="gitmopy commit --add --keep-alive"
 ```
 
-![gpyk depo](assets/gpyk.png)
+![gpyk depo](https://raw.githubusercontent.com/vict0rsch/gitmopy/main/assets/gpyk.png)
 
 ## Examples
 
@@ -90,7 +90,7 @@ $ gitmopy commit --help
 $ gitmopy info
 
 gitmopy info:
-  version      : 0.4.1
+  version      : 0.4.2
   app path     : /Users/victor/.gitmopy
   history      : /Users/victor/.gitmopy/history.json
   config       : /Users/victor/.gitmopy/config.yaml
@@ -101,6 +101,7 @@ Current configuration:
   skip_message    : False
   capitalize_title: True
   enable_history  : True
+  emoji_set       : gitmoji
 ```
 
 Update configuration with

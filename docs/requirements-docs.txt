@@ -1,0 +1,10 @@
+sphinx
+myst-parser
+furo
+sphinx-copybutton
+sphinx-autodoc-typehints
+sphinx-autoapi
+sphinx-math-dollar
+sphinx-design
+sphinx-copybutton
+sphinxext-opengraph
