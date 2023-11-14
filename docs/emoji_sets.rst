@@ -26,3 +26,10 @@ Alternative gitmojis tailored for AI/ML development. Suggestions are welcome, op
 
 .. literalinclude:: ../gitmopy/assets/ai_devmojis.yaml
     :language: yaml
+
+Custom
+------
+
+You can also define your own emoji sets in a YAML file. Run ``gitmopy info`` to see the path to that custom emojis file on your system.
+
+Custom emojis are loaded *after* the default emoji set you have selected (gitmojis or ai-devmojis). This means that you can override any emoji from the default set with your own custom emoji.
