@@ -62,19 +62,61 @@ def load_config() -> Dict[str, bool]:
     return DEFAULT_CONFIG
 
 
-def save_config(config: Dict[str, bool]) -> None:
+def check_config(config: Dict[str, Union[bool, str]]) -> None:
+    """
+    Check that the user configuration is valid.
+
+    Args:
+        config (Dict[str, Union[bool, str]]): Current gitmopy configuration
+            that should be saved
+
+
+    Raises:
+        ValueError: Unknown config key
+        ValueError: Wrong config value type
+    """
+    assert isinstance(config, dict)
+    conf = {**DEFAULT_CONFIG, **config}
+    for k, v in config.items():
+        if k not in DEFAULT_CONFIG:
+            raise ValueError(f"Unknown config key {k}")
+        if not isinstance(v, type(DEFAULT_CONFIG[k])):
+            raise ValueError(
+                f"Config key {k} must be of type {type(DEFAULT_CONFIG[k])}"
+            )
+        if k == "emoji_set" and v == "custom":
+            if not USER_EMOJIS_PATH.exists():
+                print(
+                    "[bold red]Custom emoji set selected but no file found.[/bold red]"
+                    + f" Please create {str(USER_EMOJIS_PATH)} and fill it as:\n"
+                    + dedent(
+                        """\
+                        - emoji: 🧫
+                          description: Experimental code
+                        - emoji: 💪
+                          description: Add utility functions
+                          [...]
+                        """
+                    )
+                )
+                conf[k] = "gitmoji"
+    return conf
+
+
+def save_config(config: Dict[str, Union[bool, str]]) -> None:
     """
     Save the configuration to ``${APP_PATH}/config.yaml``.
 
     Creates the parent directory if it does not exist.
 
     Args:
-        config (Dict[str, bool]): Current gitmopy configuration.
+        config (Dict[str, Union[bool, str]]): Current gitmopy configuration.
     """
     yaml_path = APP_PATH / "config.yaml"
     if not yaml_path.exists():
         print("[bold yellow] Creating config file [/bold yellow]", str(yaml_path))
     yaml_path.parent.mkdir(exist_ok=True)
+    check_config(config)
     yaml_path.write_text(safe_dump(config))
     print("✅ Config updated")
 
