@@ -84,22 +84,6 @@ def check_config(config: Dict[str, Union[bool, str]]) -> None:
             raise ValueError(
                 f"Config key {k} must be of type {type(DEFAULT_CONFIG[k])}"
             )
-        if k == "emoji_set" and v == "custom":
-            if not USER_EMOJIS_PATH.exists():
-                print(
-                    "[bold red]Custom emoji set selected but no file found.[/bold red]"
-                    + f" Please create {str(USER_EMOJIS_PATH)} and fill it as:\n"
-                    + dedent(
-                        """\
-                        - emoji: 🧫
-                          description: Experimental code
-                        - emoji: 💪
-                          description: Add utility functions
-                          [...]
-                        """
-                    )
-                )
-                conf[k] = "gitmoji"
     return conf
 
 

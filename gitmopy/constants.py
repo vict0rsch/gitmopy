@@ -74,7 +74,7 @@ DEFAULT_CHOICES = [
         "value": "emoji_set",
         "name": "Emoji set to use for commits",
         "default": "gitmoji",
-        "options": ["gitmoji", "ai-devmojis", "custom"],
+        "options": ["gitmoji", "ai-devmojis"],
     },
 ]
 """
