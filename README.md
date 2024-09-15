@@ -3,8 +3,10 @@
 An interactive Python implementation of the Gitmoji convention: [gitmoji.dev/](https://gitmoji.dev/)
 
 ```text
-pip install gitmopy
+pipx install gitmopy
 ```
+
+`pipx`? Yes, in most cases you don't want to use `gitmopy`as a library but rather as a standalone CLI and you should therefore use [`pipx`](https://github.com/pypa/pipx) rather than `pip` to install it. `pip install gitmopy` will work too if that's really what you want.
 
 ![demo-gitmopy](https://raw.githubusercontent.com/vict0rsch/gitmopy/main/assets/demo-gitmopy.gif)
 
