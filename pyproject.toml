@@ -1,33 +1,40 @@
-[tool.poetry]
+[project]
 name = "gitmopy"
 version = "0.4.2"
 description = "A python command-line for gitmoji"
-authors = ["vict0rsch <vsch@pm.me>"]
-license = "MIT"
+authors = [{ name = "vict0rsch", email = "vsch@pm.me" }]
+license = { text = "MIT" }
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.9"
-GitPython = "^3.1.31"
-typer = { extras = ["all"], version = ">=0.8.0" }
-pyyaml = "^6.0"
-inquirerpy = "^0.3.4"
-
-
-[tool.poetry.group.dev.dependencies]
-black = "^23.3.0"
-isort = "^5.12.0"
-ipython = "^8.14.0"
-pydocstyle = "^6.3.0"
-
-[tool.poetry.scripts]
-gitmopy = "gitmopy.cli:app"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires-python = ">=3.9"
+dependencies = [
+    "GitPython>=3.1.31",
+    "typer[all]>=0.8.0",
+    "pyyaml>=6.0",
+    "inquirerpy>=0.3.4",
+    "emoji>=2.14.1",
+    "wcwidth>=0.2.13",
+]
 
 [project.urls]
 Homepage = "https://github.com/vict0rsch/gitmopy"
 Repository = "https://github.com/vict0rsch/gitmopy"
 Documentation = "https://gitmopy.rtfd.io"
+
+[project.scripts]
+gitmopy = "gitmopy.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["gitmopy"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[dependency-groups]
+dev = ["ipdb>=0.13.13", "ipython>=8.18.1"]
+
+[project.optional-dependencies]
+dev = ["black>=23.3.0", "isort>=5.12.0", "ipython>=8.14.0", "pydocstyle>=6.3.0"]
