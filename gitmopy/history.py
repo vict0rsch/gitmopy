@@ -5,12 +5,19 @@ In particular:
 * sort emojis by timestamp
 * prepare history for prompt completion (title, scope, message)
 """
+
 import json
 from datetime import datetime
 from typing import Dict, List
 
 import gitmopy.constants as gpyc
-from gitmopy.utils import col, load_config, load_user_gitmojis, print
+from gitmopy.utils import (
+    col,
+    load_config,
+    load_user_gitmojis,
+    print,
+    standard_width_emoji,
+)
 
 
 def load_history() -> List[Dict[str, str]]:
@@ -110,6 +117,15 @@ def gitmojis_setup() -> None:
     for k, e in enumerate(gpyc.EMOJIS):
         gpyc.EMOJIS[k]["name"] = e["emoji"] + " " + e["description"]
         gpyc.EMOJIS[k]["value"] = e["emoji"]
+
+    for k, e in enumerate(gpyc.CONVENTIONAL):
+        gpyc.CONVENTIONAL[k]["emoji"] = standard_width_emoji(e["emoji"])
+
+    keys = [f"{e['emoji']} {e['convention']}" for e in gpyc.CONVENTIONAL]
+    for k, e in enumerate(gpyc.CONVENTIONAL):
+        name = f"{keys[k]} ―― {e['description']}"
+        gpyc.CONVENTIONAL[k]["name"] = name
+        gpyc.CONVENTIONAL[k]["value"] = e["emoji"] + " " + e["convention"] + ":"
 
     if not config["enable_history"]:
         return

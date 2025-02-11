@@ -4,7 +4,7 @@ Module handling user prompts.
 Prompts typically parameterize the commit message or ``gitmopy``'s behavior.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from InquirerPy import inquirer
 from InquirerPy.base.control import Choice
@@ -12,7 +12,14 @@ from prompt_toolkit.completion import Completer, Completion
 from prompt_toolkit.document import Document
 
 import gitmopy.constants as gpyc
-from gitmopy.utils import choice_separator, load_config, safe_capitalize, save_config
+from gitmopy.constants import _sentinels
+from gitmopy.utils import (
+    choice_separator,
+    clear_line_and_move_up,
+    load_config,
+    safe_capitalize,
+    save_config,
+)
 
 
 class GMPCompleter(Completer):
@@ -67,7 +74,21 @@ class GMPCompleter(Completer):
             yield Completion(m[0], start_position=-len(document.text))
 
 
-def commit_prompt(config: Dict[str, bool]) -> Dict[str, str]:
+def try_func_with_keyboard_interrupt(func: Callable, *args, **kwargs):
+    """
+    Try a function and catch a KeyboardInterrupt.
+    """
+    try:
+        return func(*args, **kwargs)
+    except KeyboardInterrupt:
+        return None
+
+
+def commit_prompt(
+    config: Dict[str, bool],
+    state: Dict[str, str] | None = None,
+    simple: bool = False,
+) -> Dict[str, str]:
     """
     Prompt the user for emoji, scope title and message to make a commit message.
 
@@ -78,86 +99,112 @@ def commit_prompt(config: Dict[str, bool]) -> Dict[str, str]:
 
     Args:
         config (dict): Configuration dictionary, from ``gitmopy config``.
-
+        state (dict): State dictionary from previous prompts.
     Returns:
         dict: User-specified commit as a dict with keys
             ``"emoji"``, ``"scope"``, ``"title"``, ``"message"``.
     """
     # get the commit's gitmoji
-    emoji = (
-        inquirer.fuzzy(
-            message="Select gitmoji:",
-            choices=gpyc.EMOJIS,
-            multiselect=False,
-            max_height="70%",
-            mandatory=True,
-            qmark="❓",
-            amark="✓",
-        )
-        .execute()
-        .strip()
-    )
-
-    scope = message = ""
-
-    if not config["skip_scope"]:
-        # get the commit's scope
-        scope = (
-            inquirer.text(
-                message="Select scope (optional):",
-                mandatory=False,
-                qmark="⭕️",
+    emoji = state.get("emoji")
+    if emoji is None:
+        emoji_message = "Select gitmoji:" if not simple else "Select Conventional type:"
+        emoji_choices = gpyc.EMOJIS if not simple else gpyc.CONVENTIONAL
+        emoji = try_func_with_keyboard_interrupt(
+            lambda: inquirer.fuzzy(
+                message=emoji_message,
+                choices=emoji_choices,
+                multiselect=False,
+                max_height="70%",
+                mandatory=True,
+                qmark="❓",
                 amark="✓",
-                completer=GMPCompleter("scope"),
             )
             .execute()
             .strip()
         )
+    if emoji is None:
+        return _sentinels["cancelled"]
+    state["emoji"] = emoji
+
+    scope = message = ""
+
+    if not config["skip_scope"] and not simple:
+        # get the commit's scope
+        scope = state.get("scope")
+        if scope is None:
+            scope = try_func_with_keyboard_interrupt(
+                lambda: inquirer.text(
+                    message="Select scope (optional):",
+                    mandatory=False,
+                    qmark="⭕️",
+                    amark="✓",
+                    completer=GMPCompleter("scope"),
+                )
+                .execute()
+                .strip()
+            )
+        if scope is None:
+            state.pop("emoji")
+            clear_line_and_move_up()
+            return commit_prompt(config, state, simple)
+    state["scope"] = scope
 
     # get the commit's title
-    title = (
-        inquirer.text(
-            message="Commit title:",
-            long_instruction="<= 50 characters ideally",
-            mandatory=True,
-            mandatory_message="You must provide a commit tile",
-            validate=lambda t: len(t) > 0,
-            invalid_message="You must provide a commit tile",
-            qmark="⭐️",
-            amark="✓",
-            transformer=lambda t: safe_capitalize(t)
-            if config["capitalize_title"]
-            else t,
-            completer=GMPCompleter("title"),
+    title = state.get("title")
+    if title is None:
+        title = try_func_with_keyboard_interrupt(
+            lambda: inquirer.text(
+                message="Commit title:",
+                long_instruction="<= 50 characters ideally",
+                mandatory=True,
+                mandatory_message="You must provide a commit tile",
+                validate=lambda t: len(t) > 0,
+                invalid_message="You must provide a commit tile",
+                qmark="⭐️",
+                amark="✓",
+                transformer=lambda t: safe_capitalize(t)
+                if config["capitalize_title"]
+                else t,
+                completer=GMPCompleter("title"),
+            )
+            .execute()
+            .strip()
         )
-        .execute()
-        .strip()
-    )
+    if title is None:
+        state.pop("scope")
+        if simple:
+            state.pop("emoji")
+        clear_line_and_move_up()
+        return commit_prompt(config, state, simple)
+    state["title"] = title
+
     # Capitalize the title if the user wants to (from config)
     if config["capitalize_title"]:
         title = safe_capitalize(title)
 
     if not config["skip_message"]:
         # get the commit's message
-        message = (
-            inquirer.text(
-                message="Commit details (optional):",
-                mandatory=False,
-                qmark="💬",
-                amark="✓",
-                completer=GMPCompleter("message"),
+        message = state.get("message")
+        if message is None:
+            message = try_func_with_keyboard_interrupt(
+                lambda: inquirer.text(
+                    message="Commit details (optional):",
+                    mandatory=False,
+                    qmark="💬",
+                    amark="✓",
+                    completer=GMPCompleter("message"),
+                )
+                .execute()
+                .strip()
             )
-            .execute()
-            .strip()
-        )
+        if message is None:
+            state.pop("title")
+            clear_line_and_move_up()
+            return commit_prompt(config, state, simple)
+    state["message"] = message
 
     # return commit details as a dict
-    return {
-        "emoji": emoji,
-        "scope": scope,
-        "title": title,
-        "message": message,
-    }
+    return state
 
 
 def config_prompt() -> None:

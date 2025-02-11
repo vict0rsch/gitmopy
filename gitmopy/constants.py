@@ -1,6 +1,7 @@
 """
 Constants for gitmopy.
 """
+
 from os.path import expandvars
 from pathlib import Path
 
@@ -38,6 +39,7 @@ COLORS = {
     "y": "yellow3",
     "o": "orange3",
     "p": "plum3",
+    "a": "gray",
 }
 """
 Rich colours for prints.
@@ -112,4 +114,11 @@ AI_DEVMOJIS = safe_load((Path(__file__).parent / "assets/ai_devmojis.yaml").read
 """
 List of emojis and their code and description according to a custom specification
 tailored for AI/ML projects and development.
+"""
+
+CONVENTIONAL = safe_load(
+    (Path(__file__).parent / "assets/conventional.yaml").read_text()
+)
+"""
+List of conventional commits and their code and description.
 """

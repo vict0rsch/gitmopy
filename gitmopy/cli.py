@@ -1,6 +1,7 @@
 """
 Command line interface for gitmopy.
 """
+
 from typing import List, Optional
 
 import git
@@ -303,6 +304,12 @@ def commit(
             + "for another one. "
         ),
     ] = False,
+    simple: Annotated[
+        bool,
+        typer.Option(
+            help="Whether or not to use a simple commit which merges conventional commits and gitmoji."
+        ),
+    ] = False,
 ):
     """
     Main command: commit staged files, and staging files if need be.
@@ -401,7 +408,8 @@ def commit(
 
         # PROMPT: get user's commit details
         print(f"\n[u]{col('Commit details:', 'g')}[/u]")
-        commit_dict = catch_keyboard_interrupt(commit_prompt, config)
+        print(f"ℹ️ {col('Press [b]ctrl+c[/b] to go back to the previous step', 'a')}\n")
+        commit_dict = catch_keyboard_interrupt(commit_prompt, config, {}, simple)
         if commit_dict is _sentinels["stop"]:
             break
         elif commit_dict is _sentinels["restart"]:
