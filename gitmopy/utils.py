@@ -1,12 +1,14 @@
 """
 Utility functions and constants for ``gitmopy``.
 """
+
 from os.path import expandvars
 from pathlib import Path
 from shutil import get_terminal_size
 from textwrap import dedent
 from typing import Any, Dict, List, Union
 
+import wcwidth
 from InquirerPy.separator import Separator
 from rich.console import Console
 from yaml import safe_dump, safe_load
@@ -287,3 +289,23 @@ def validate_user_emojis(custom_emos: Any) -> List[Dict[str, str]]:
             raise ValueError("Custom gitmojis must have a non-empty 'emoji' key")
         if not gitmoji["description"]:
             raise ValueError("Custom gitmojis must have a non-empty 'description' key")
+
+
+def clear_line_and_move_up():
+    """
+    Clear the current line and move up one line in the terminal.
+    """
+    import sys
+
+    sys.stdout.write("\033[2K\033[A")
+    sys.stdout.flush()
+
+
+def standard_width_emoji(emoji: str, to=2) -> str:
+    """
+    Return a standard width emoji of width 2.
+    """
+    assert to >= 2
+    if len(emoji) > 1:
+        emoji = emoji[0]
+    return emoji + " " * (to - wcwidth.wcwidth(emoji))
