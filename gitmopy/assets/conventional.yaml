@@ -1,0 +1,41 @@
+# hybrid conv entional commits + gitmo
+- convention: build
+  emoji: 🏗️
+  description: "Changes that affect the build system or external dependencies (example scopes: npm, uv, pip, etc.)"
+
+- convention: ci
+  emoji: 🔄
+  description: "Changes to our CI configuration files and scripts (example scopes: pre-commit, .github/workflows/..., etc.)"
+
+- convention: docs
+  emoji: 📝
+  description: "Changes to the documentation"
+
+- convention: feat
+  emoji: ✨
+  description: "A new feature"
+
+- convention: fix
+  emoji: 🐛
+  description: "A bug fix"
+
+- convention: perf
+  emoji: ⚡️
+  description: "A code change that improves performance"
+
+- convention: refactor
+  emoji: ♻️
+  description: "A code change that neither fixes a bug nor adds a feature"
+
+- convention: style
+  emoji: 💄
+  description: "Changes that do not affect the meaning of the code (white-space, formatting, etc)"
+
+- convention: test
+  emoji: 🧪
+  description: "Adding missing tests or correcting existing tests"
+
+- convention: chore
+  emoji: 🧹
+  description: "Other changes that don't modify src or test files"
+
