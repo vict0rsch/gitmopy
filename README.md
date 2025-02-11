@@ -3,25 +3,27 @@
 An interactive Python implementation of the Gitmoji convention: [gitmoji.dev/](https://gitmoji.dev/)
 
 ```text
-pipx install gitmopy
+uv tool run gitmopy
+# or
+uvx gitmopy
 ```
 
-`pipx`? Yes, in most cases you don't want to use `gitmopy`as a library but rather as a standalone CLI and you should therefore use [`pipx`](https://github.com/pypa/pipx) rather than `pip` to install it. `pip install gitmopy` will work too if that's really what you want.
+`uv`? Yes, in most cases you don't want to use `gitmopy`as a library but rather as a standalone CLI and you should therefore use [`uv`](https://docs.astral.sh/uv/getting-started/installation/) rather than `pip` to install it. `pip install gitmopy` will work too if that's really what you want.
 
 ![demo-gitmopy](https://raw.githubusercontent.com/vict0rsch/gitmopy/main/assets/demo-gitmopy.gif)
 
 ## How to use
 
-* I typically use `$ gitmopy commit --add --keep-alive`
-* Navigate through options with ⬆️ and ⬇️
-* **Select** option with **`space`**
-* **Validate** selection with **`enter`**
-* Press **`tab`** to **auto-complete**
-  * Press `tab` on an empty line to see history
-* **Restart commit** with **`crtl+c`**
-  * The keyboard interruption will be caught once, then press `enter` to restart
-* Push (and set upstream if need be)
-* Commit again 🔄
+-   I typically use `$ gitmopy commit --add --keep-alive`
+-   Navigate through options with ⬆️ and ⬇️
+-   **Select** files with **`space`**
+-   **Validate** selection with **`enter`**
+-   Press **`tab`** to **auto-complete**
+    -   Press `tab` on an empty line to see history
+-   **Restart commit** with **`crtl+c`**
+    -   In the committing routine, press `ctrl+c` to go back to the previous step (for instance if you made a mistake in the commit title)
+-   Push (and set upstream if need be)
+-   Commit again 🔄
 
 You can also select another set of default emojis tailored towards AI/ML development by running `gitmopy config` then pressing `Enter` and choosing `ai-devmojis` as the config option.
 
@@ -177,16 +179,16 @@ $ gitmopy commit --help
 
 ## To Do
 
-* Features
-  * *If requested:*
-    * Install hook
-    * `git commit` flags (like `-S`)
-    * max history length (if loading the json becomes slow)
-* Tests
-  * [typer.tiangolo.com/tutorial/testing/](https://typer.tiangolo.com/tutorial/testing/)
-  * 👋 **Help wanted**
-* Docs
-  * Not critical
+-   Features
+    -   _If requested:_
+        -   Install hook
+        -   `git commit` flags (like `-S`)
+        -   max history length (if loading the json becomes slow)
+-   Tests
+    -   [typer.tiangolo.com/tutorial/testing/](https://typer.tiangolo.com/tutorial/testing/)
+    -   👋 **Help wanted**
+-   Docs
+    -   Not critical
 
 ## Resources
 
@@ -194,6 +196,6 @@ $ gitmopy commit --help
 
 It is built thanks to:
 
-* [`typer`](https://github.com/tiangolo/typer)
-* [`InquirePy`](https://github.com/kazhala/InquirerPy)
-* [`GitPython`](https://github.com/gitpython-developers/GitPython)
+-   [`typer`](https://github.com/tiangolo/typer)
+-   [`InquirePy`](https://github.com/kazhala/InquirerPy)
+-   [`GitPython`](https://github.com/gitpython-developers/GitPython)
