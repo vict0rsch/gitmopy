@@ -40,6 +40,7 @@ from gitmopy.utils import (
     print,
     print_staged_files,
     resolve_path,
+    set_start_options,
     terminal_separator,
 )
 
@@ -310,6 +311,12 @@ def commit(
             help="Whether or not to use a simple commit which merges conventional commits and gitmoji."
         ),
     ] = False,
+    sign: Annotated[
+        bool,
+        typer.Option(
+            help="Whether or not to sign the commit with GPG. Equivalent to `git commit -S`."
+        ),
+    ] = False,
 ):
     """
     Main command: commit staged files, and staging files if need be.
@@ -433,7 +440,10 @@ def commit(
             save_to_history(commit_dict)
 
         # commit
-        repo.index.commit(commit_message)
+        if sign:
+            repo.git.commit("-S", "-m", commit_message)
+        else:
+            repo.index.commit(commit_message)
 
         if push:
             push_cli(repo, remote)
@@ -454,6 +464,7 @@ def config():
     """
     Command to setup gitmopy's configuration.
     """
+    set_start_options()
     config_prompt()
 
 
@@ -479,6 +490,44 @@ def info():
     for k, v in config.items():
         print(f"  {k:{max_l}}: {v}")
     print()
+
+
+@app.command()
+def start():
+    """
+    Runs the commit command with the default arguments you have set in the
+    configuration file. If no such arguments are set, you will be prompted to
+    set them interactively.
+    """
+    conf = load_config()
+    if "default_commit_args" not in conf:
+        config()
+        conf = load_config()
+    commit_args = {
+        "repo": conf["default_commit_args"]["repo"],
+        "remote": list(
+            map(str.strip, conf["default_commit_args"]["remote"].split(","))
+        ),
+    }
+    for flag in conf["default_commit_flags"]:
+        commit_args[flag] = True
+    if not commit_args.get("push"):
+        commit_args.pop("remote", None)
+    cmd = "  $ gitmopy commit"
+    for flag, v in commit_args.items():
+        if isinstance(v, bool):
+            if v:
+                cmd += f" --{flag}"
+        elif isinstance(v, list):
+            for value in v:
+                cmd += f" --{flag} {value}"
+        else:
+            cmd += f" --{flag} {v}"
+    print(f"{col('Running:', 'b', True)} {cmd.strip()}")
+    print()
+    print(terminal_separator())
+    print()
+    commit(**commit_args)
 
 
 if __name__ == "__main__":

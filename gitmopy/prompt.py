@@ -257,6 +257,36 @@ def config_prompt() -> None:
         ).execute()
         options[ldict["value"]] = option
 
+    multiple_choices = [
+        c
+        for c in gpyc.DEFAULT_CHOICES
+        if isinstance(c["default"], list) and "options" in c
+    ]
+
+    for c in multiple_choices:
+        option = inquirer.checkbox(
+            message=c["name"],
+            choices=c["options"],
+            default=c["default"],
+            qmark="❓",
+            amark="✓",
+        ).execute()
+        options[c["value"]] = option
+
+    string_inputs = [c for c in gpyc.DEFAULT_CHOICES if isinstance(c["default"], dict)]
+
+    for c in string_inputs:
+        for k, v in c["options"].items():
+            option = inquirer.text(
+                message=f"{k} ({v}):",
+                qmark="❓",
+                amark="✓",
+                default=c["default"][k],
+            ).execute()
+            if c["value"] not in options:
+                options[c["value"]] = {}
+            options[c["value"]][k] = option
+
     for c in choices:
         config[c.value] = c.value in selected
     config.update(options)

@@ -1,6 +1,6 @@
 [project]
 name = "gitmopy"
-version = "0.5.0"
+version = "0.6.0"
 description = "A python command-line for gitmoji"
 authors = [{ name = "vict0rsch", email = "vsch@pm.me" }]
 license = { text = "MIT" }
