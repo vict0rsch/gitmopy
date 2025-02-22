@@ -513,9 +513,17 @@ def start():
         commit_args[flag] = True
     if not commit_args.get("push"):
         commit_args.pop("remote", None)
-    print(f"{col('Running commit with the following arguments:', 'b', True)}")
-    for k, v in commit_args.items():
-        print(f"  {k}: {v}")
+    cmd = "  $ gitmopy commit"
+    for flag, v in commit_args.items():
+        if isinstance(v, bool):
+            if v:
+                cmd += f" --{flag}"
+        elif isinstance(v, list):
+            for value in v:
+                cmd += f" --{flag} {value}"
+        else:
+            cmd += f" --{flag} {v}"
+    print(f"{col('Running:', 'b', True)} {cmd.strip()}")
     print()
     print(terminal_separator())
     print()
