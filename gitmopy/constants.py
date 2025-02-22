@@ -79,10 +79,26 @@ DEFAULT_CHOICES = [
         "default": "gitmoji",
         "options": ["gitmoji", "ai-devmojis"],
     },
+    {
+        "value": "default_commit_flags",
+        "name": "Default commit binary flags used in `gitmopy start`",
+        "default": [],
+        "options": [],  # must be set programmatically by `set_start_options`
+    },
+    {
+        "value": "default_commit_args",
+        "name": "Default commit arguments used in `gitmopy start`",
+        "default": {"repo": ".", "remote": "origin"},
+        "options": {
+            "repo": "Path to the git repository",
+            "remote": "Comma-separated list of remotes to push to",
+        },
+    },
 ]
 """
 Choices for the setup prompt.
 """
+
 
 DEFAULT_CONFIG = {c["value"]: c["default"] for c in DEFAULT_CHOICES}
 """

@@ -40,6 +40,7 @@ from gitmopy.utils import (
     print,
     print_staged_files,
     resolve_path,
+    set_start_options,
     terminal_separator,
 )
 
@@ -463,6 +464,7 @@ def config():
     """
     Command to setup gitmopy's configuration.
     """
+    set_start_options()
     config_prompt()
 
 
@@ -488,6 +490,36 @@ def info():
     for k, v in config.items():
         print(f"  {k:{max_l}}: {v}")
     print()
+
+
+@app.command()
+def start():
+    """
+    Runs the commit command with the default arguments you have set in the
+    configuration file. If no such arguments are set, you will be prompted to
+    set them interactively.
+    """
+    conf = load_config()
+    if "default_commit_args" not in conf:
+        config()
+        conf = load_config()
+    commit_args = {
+        "repo": conf["default_commit_args"]["repo"],
+        "remote": list(
+            map(str.strip, conf["default_commit_args"]["remote"].split(","))
+        ),
+    }
+    for flag in conf["default_commit_flags"]:
+        commit_args[flag] = True
+    if not commit_args.get("push"):
+        commit_args.pop("remote", None)
+    print(f"{col('Running commit with the following arguments:', 'b', True)}")
+    for k, v in commit_args.items():
+        print(f"  {k}: {v}")
+    print()
+    print(terminal_separator())
+    print()
+    commit(**commit_args)
 
 
 if __name__ == "__main__":

@@ -13,7 +13,13 @@ from InquirerPy.separator import Separator
 from rich.console import Console
 from yaml import safe_dump, safe_load
 
-from gitmopy.constants import APP_PATH, COLORS, DEFAULT_CONFIG, USER_EMOJIS_PATH
+from gitmopy.constants import (
+    APP_PATH,
+    COLORS,
+    DEFAULT_CHOICES,
+    DEFAULT_CONFIG,
+    USER_EMOJIS_PATH,
+)
 
 console = Console()
 print = console.print
@@ -309,3 +315,23 @@ def standard_width_emoji(emoji: str, to=2) -> str:
     if len(emoji) > 1:
         emoji = emoji[0]
     return emoji + " " * (to - wcwidth.wcwidth(emoji))
+
+
+def set_start_options():
+    """
+    Set the options for the default commit arguments automatically from the ``gitmopy commit`` command's signature.
+    """
+    global DEFAULT_CHOICES
+    import inspect
+
+    from gitmopy.cli import commit
+
+    start_idx = next(
+        i for i, c in enumerate(DEFAULT_CHOICES) if c["value"] == "default_commit_flags"
+    )
+
+    DEFAULT_CHOICES[start_idx]["options"] = sorted(
+        arg
+        for arg in inspect.signature(commit).parameters.keys()
+        if arg not in {"repo", "remote"}
+    )
