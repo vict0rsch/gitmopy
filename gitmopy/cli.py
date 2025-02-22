@@ -310,6 +310,12 @@ def commit(
             help="Whether or not to use a simple commit which merges conventional commits and gitmoji."
         ),
     ] = False,
+    sign: Annotated[
+        bool,
+        typer.Option(
+            help="Whether or not to sign the commit with GPG. Equivalent to `git commit -S`."
+        ),
+    ] = False,
 ):
     """
     Main command: commit staged files, and staging files if need be.
@@ -433,7 +439,10 @@ def commit(
             save_to_history(commit_dict)
 
         # commit
-        repo.index.commit(commit_message)
+        if sign:
+            repo.git.commit("-S", "-m", commit_message)
+        else:
+            repo.index.commit(commit_message)
 
         if push:
             push_cli(repo, remote)
