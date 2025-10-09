@@ -34,7 +34,11 @@ packages = ["gitmopy"]
 allow-direct-references = true
 
 [dependency-groups]
-dev = ["ipdb>=0.13.13", "ipython>=8.18.1"]
+dev = [
+    "ipdb>=0.13.13",
+    "ipython>=8.18.1",
+    "pre-commit>=4.3.0",
+]
 
 [project.optional-dependencies]
 dev = ["black>=23.3.0", "isort>=5.12.0", "ipython>=8.14.0", "pydocstyle>=6.3.0"]
