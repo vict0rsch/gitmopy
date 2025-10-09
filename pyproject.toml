@@ -8,7 +8,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
     "GitPython>=3.1.31",
-    "typer[all]>=0.8.0",
+    "typer>=0.8.0",
     "pyyaml>=6.0",
     "inquirerpy>=0.3.4",
     "emoji>=2.14.1",
