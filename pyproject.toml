@@ -1,6 +1,6 @@
 [project]
 name = "gitmopy"
-version = "0.6.0"
+version = "0.6.1"
 description = "A python command-line for gitmoji"
 authors = [{ name = "vict0rsch", email = "vsch@pm.me" }]
 license = { text = "MIT" }
@@ -34,11 +34,7 @@ packages = ["gitmopy"]
 allow-direct-references = true
 
 [dependency-groups]
-dev = [
-    "ipdb>=0.13.13",
-    "ipython>=8.18.1",
-    "pre-commit>=4.3.0",
-]
+dev = ["ipdb>=0.13.13", "ipython>=8.18.1", "pre-commit>=4.3.0"]
 
 [project.optional-dependencies]
 dev = ["black>=23.3.0", "isort>=5.12.0", "ipython>=8.14.0", "pydocstyle>=6.3.0"]
