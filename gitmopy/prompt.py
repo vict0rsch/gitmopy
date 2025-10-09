@@ -356,6 +356,28 @@ def choose_remote_prompt(remotes: List[str]) -> List[str]:
     return selected
 
 
+def confirm_prompt(message: str, default: bool = False) -> bool:
+    """
+    Prompt the user to confirm an action.
+
+    Args:
+        message (str): Message to display to the user.
+        default (bool): Default value.
+
+    Returns:
+        bool: User's confirmation.
+    """
+    default_str = "[default: y]" if default else "[default: n]"
+    return inquirer.confirm(
+        message,
+        long_instruction=default_str,
+        qmark="❓",
+        amark="✓",
+        default=default,
+        instruction="Use 'y' or 'n'.",
+    ).execute()
+
+
 def set_upstream_prompt(branch_name: str, remote_name: str) -> bool:
     """
     Prompt the user to set the upstream branch for a remote.
@@ -367,13 +389,11 @@ def set_upstream_prompt(branch_name: str, remote_name: str) -> bool:
     Returns:
         bool: Whether or not to set the upstream branch.
     """
-    return inquirer.confirm(
+    prompt = (
         f"'{remote_name}' does not have a branch named '{branch_name}'."
-        + " Create upstream branch?",
-        qmark="❓",
-        amark="✓",
-        default=True,
-    ).execute()
+        + " Create upstream branch?"
+    )
+    return confirm_prompt(prompt, default=True)
 
 
 def what_now_prompt(choices: Dict[str, str]) -> str:

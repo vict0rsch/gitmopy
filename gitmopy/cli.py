@@ -6,7 +6,8 @@ from typing import List, Optional
 
 import git
 import typer
-from git import Repo
+from git import GitCommandError, Repo
+from rich.panel import Panel
 from typing_extensions import Annotated
 
 from gitmopy.constants import (
@@ -28,6 +29,7 @@ from gitmopy.prompt import (
     choose_remote_prompt,
     commit_prompt,
     config_prompt,
+    confirm_prompt,
     git_add_prompt,
     set_upstream_prompt,
     what_now_prompt,
@@ -260,7 +262,8 @@ def pull_cli(repo: Repo, remote_cli_args: List[str]):
                 done = col(f"Pulled from remote {remote.name}", "b", True)
                 with console.status(wait, spinner_style=COLORS["o"]):
                     cre = None
-                    with CatchRemoteException(remote.name) as cre:
+                    with CatchRemoteException(remote.name) as exception_context:
+                        cre = exception_context
                         repo.git.pull(remote.name, repo.active_branch.name)
                     if cre and not cre.error:
                         print(done)
@@ -316,6 +319,10 @@ def commit(
         typer.Option(
             help="Whether or not to sign the commit with GPG. Equivalent to `git commit -S`."
         ),
+    ] = False,
+    no_verify: Annotated[
+        bool,
+        typer.Option(help="Whether or not to commit without running pre-commit hooks."),
     ] = False,
 ):
     """
@@ -439,13 +446,38 @@ def commit(
             # save commit details to history
             save_to_history(commit_dict)
 
-        # commit
-        if sign:
-            repo.git.commit("-S", "-m", commit_message)
-        else:
-            repo.index.commit(commit_message)
+        # Commit
+        # Protect from pre-commit hooks failures
+        no_verify_local = no_verify
+        commit_error = True
+        while True:
+            try:
+                args = []
+                if no_verify_local:
+                    args.append("--no-verify")
+                if sign:
+                    args.append("-S")
+                args += ["-m", commit_message]
+                repo.git.commit(*args)
+                commit_error = False
+                break
+            except GitCommandError as gce:
+                panel = Panel(
+                    str(gce),
+                    border_style="red",
+                    title="Error committing:",
+                    expand=False,
+                    padding=(1, 2),
+                )
+                print(panel)
+                no_verify_local = no_verify or confirm_prompt(
+                    "Do you want to try again, committing without running pre-commit hooks?"
+                )
+                if not no_verify_local:
+                    print("Commit failed. Please fix the errors and try again.")
+                    break
 
-        if push:
+        if push and not commit_error:
             push_cli(repo, remote)
 
         if keep_alive and should_commit_again(repo, remote):
